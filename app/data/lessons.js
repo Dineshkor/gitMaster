@@ -1,669 +1,888 @@
 export const LESSONS = [
-    // ─── MODULE 1: CORE CONCEPTS & SETUP ───
+    // ─── MODULE 1: FUNDAMENTALS (Setup & Local Basics) ───
     {
-        id: 1, module: "Core Concepts & Setup", title: "Git vs GitHub",
-        icon: "☕", xp: 50,
-        content: "Let's start with the most common confusion beginners have: Git and GitHub are NOT the same thing!\n\nThink of it like coffee and a coffee shop:\n\n• Git is the coffee — it's the actual tool that lives on YOUR computer. It tracks every change you make to your files: who changed what, when, and where. Git works completely offline, with no internet needed. It's a career-long skill that every developer uses.\n\n• GitHub is the coffee shop — it's a website (a cloud service) where you can store your Git projects online, share them with others, and collaborate as a team.\n\nYou can use Git without GitHub (just like you can make coffee at home), but GitHub without Git doesn't make much sense.",
-        explanation: "Understanding this distinction is crucial. Git is the engine under the hood — the version control system. GitHub, GitLab, and Bitbucket are just cloud platforms built on top of Git. Master Git first, and you'll be comfortable with any hosting service.",
+        id: 1, module: "Module 1: Fundamentals", title: "The 'Git' Philosophy",
+        icon: "💡", xp: 50,
+        content: "Before we touch the terminal, let's understand Git's philosophy. Most beginners think of Git as a way to save files. It's much deeper than that.\n\nImagine you're developing a secret coffee roast. Traditional 'saving' is like overwriting your recipe every time. Git is different — it's like a **Time Machine** for your recipe book. It records every tiny tweak, who made it, and why.\n\n### Why Git Matters:\n• **Collaboration**: Parallel roasting! You tweak the beans while your partner tweaks the water temperature.\n• **Safety**: If a batch is ruined, you instantly jump back to 'Version 4'.\n• **Context**: Every save (commit) explains *why* a change was made.",
+        explanation: "Pro Git 1.1: Git is a Distributed Version Control System. Unlike Centralized systems (SVN), every developer has a FULL copy of the project history on their own machine. This is your project's digital immune system.",
         challenge: {
-            type: "quiz", question: "Which statement best describes the relationship between Git and GitHub?",
+            type: "quiz", question: "What is the core difference between Git and traditional saving?",
             options: [
-                "They are the same tool with different names",
-                "Git is a local version control tool; GitHub is a cloud hosting service built on top of Git",
-                "GitHub is the tool you install; Git is the website",
-                "You must use GitHub to use Git"
+                "Git saves files faster than a regular editor",
+                "Git only works when you have an internet connection",
+                "Git keeps a complete history of all changes, allowing you to 'time travel'",
+                "Git replaces the need for folders"
             ],
-            answer: 1, hint: "Remember the coffee analogy — one is the product, the other is the store."
+            answer: 2, hint: "Think about the recipe book analogy — do we overwrite or record?"
         },
-        initialState: { commits: [], branches: ["main"], head: "main", files: [{ name: "my-project/", status: "system" }] }
+        initialState: { commits: [], branches: ["main"], head: "main", files: [] }
     },
     {
-        id: 2, module: "Core Concepts & Setup", title: "The Three Stages of Git",
-        icon: "🏗️", xp: 75,
-        content: "Git has a unique three-stage architecture that every beginner must understand. Think of it like shipping a package:\n\n1. Working Directory (Your Desk)\nThis is where you actively edit and create files. Any file you open, modify, or create lives here. Git can SEE these changes, but it hasn't saved them yet.\n\n2. Staging Area (The Shipping Box)\nThis is the \"middle ground\" — a preparation zone. When you're happy with certain changes, you move them here. Think of it as placing items into a shipping box before sealing it. You choose EXACTLY which changes to include.\n\n3. Local Repository (The Post Office)\nWhen you \"commit,\" your staged changes are permanently saved here. It's like dropping off your sealed package — it's now part of the official record. Each commit is a snapshot you can return to at any time.\n\nThe flow is always: Working Directory → Staging Area → Repository",
-        explanation: "This three-stage design gives you precise control. Unlike a simple 'Save' button, Git lets you review and select exactly which changes to record. This is powerful when you've changed 10 files but only want to save 3 of them in one commit.",
+        id: 2, module: "Module 1: Fundamentals", title: "Git vs GitHub: The Coffee Shop",
+        icon: "☕", xp: 50,
+        content: "Beginners often confuse Git and GitHub. Let's use our coffee shop analogy to fix that once and for all:\n\n• **Git is the Coffee Engine**: It's the technical tool on your local machine. It tracks files offline. You own the engine.\n• **GitHub is the Coffee Shop**: It's the social cloud platform where you host your projects. It's the place where others can 'taste' your code and collaborate.\n\nYou use Git to brew the project; you use GitHub to serve it to the world.",
+        explanation: "Git is the engine; GitHub is the garage. You can build a car in your engine without a garage, but the garage makes it easier to show it to friends and work on it together.",
         challenge: {
-            type: "quiz", question: "What is the correct order of Git's three stages?",
+            type: "quiz", question: "Can you use Git without having a GitHub account?",
             options: [
-                "Repository → Staging Area → Working Directory",
-                "Working Directory → Repository → Staging Area",
-                "Working Directory → Staging Area → Repository",
-                "Staging Area → Working Directory → Repository"
+                "No, Git requires a cloud connection to work",
+                "Yes, because Git is a local tool that works completely offline",
+                "Only if you use a Mac",
+                "Only for projects smaller than 1GB"
             ],
-            answer: 2, hint: "Think about the shipping analogy: desk → box → post office."
+            answer: 1, hint: "Remember the engine/garage analogy."
+        },
+        initialState: { commits: [], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 3, module: "Module 1: Fundamentals", title: "The Three Stages: Your Desk",
+        icon: "🏗️", xp: 75,
+        content: "Git doesn't just 'save' everything at once. It uses a **Three-Stage Architecture** for surgical precision:\n\n1. **Working Directory (Your Desk)**: Where you currently edit files. Changes here are 'untracked' or 'modified'.\n2. **Staging Area (The Shipping Box)**: A landing zone for changes you *intend* to save. You can choose to stage File A but not File B.\n3. **Repository (The Vault)**: Where Git stores the final, permanent snapshots (commits).\n\nThis workflow ensures your project history is clean and intentional.",
+        explanation: "Pro Git 1.3: The three states of your files: Modified, Staged, and Committed. This unique design is what gives Git its power over simple 'Autosave' features.",
+        challenge: {
+            type: "quiz", question: "Which area acts as a 'middle ground' where you prepare specific changes before saving?",
+            options: [
+                "The Vault",
+                "The Working Directory",
+                "The Staging Area",
+                "The .git folder"
+            ],
+            answer: 2, hint: "It's like a shipping box you're filling up."
         },
         initialState: {
-            commits: [
-                { id: "c1", msg: "Initial commit", branch: "main", marker: "The Big Bang", milestone: true, storyContext: "The moment the coffee shop dream became a project! This commit is the root of the entire tree." }
-            ],
+            commits: [],
             branches: ["main"], head: "main",
-            files: [{ name: "index.html", status: "modified" }, { name: "style.css", status: "staged" }, { name: "app.js", status: "committed" }]
+            files: [
+                { name: "roast_v1.txt", status: "modified" },
+                { name: "beans.md", status: "staged" },
+                { name: "shop_logo.png", status: "untracked" }
+            ]
         }
     },
     {
-        id: 3, module: "Core Concepts & Setup", title: "The Hidden .git Folder",
+        id: 4, module: "Module 1: Fundamentals", title: "Initializing the 'Brain'",
         icon: "📁", xp: 50,
-        content: "When you initialize Git in a project, it creates a hidden folder called `.git` inside your project directory. This is the brain of your repository!\n\nThe `.git` folder contains:\n• All your commit history (every snapshot ever saved)\n• Branch information (which timelines exist)\n• Configuration settings (your name, email, etc.)\n• The HEAD pointer (which tells Git where you currently are)\n\nYou should NEVER manually edit or delete the `.git` folder. If you delete it, you lose ALL your version history — it's like erasing your project's entire memory.\n\nThe `.git` folder is hidden by default because you don't need to interact with it directly — Git manages it for you behind the scenes.",
-        explanation: "The .git folder is what makes a regular folder into a Git repository. Without it, Git has no idea your project exists. Everything Git knows lives inside this hidden directory.",
+        content: "Every tracked project needs a brain. In Git, this brain is the hidden `.git` folder. Without it, your folder is just a regular bunch of files.\n\nWhen you run `git init`, Git creates this hidden folder. It contains all the history, configurations, and pointers. **Never delete this folder** unless you want to erase your project's memory forever!",
+        explanation: "The .git folder is the repository. Everything else in your project folder is just a 'checkout' of one version of your project.",
         challenge: {
-            type: "quiz", question: "What happens if you delete the .git folder from your project?",
-            options: [
-                "Nothing, Git recreates it automatically",
-                "Your files are deleted",
-                "You lose all version history but keep your current files",
-                "Git stops working on your entire computer"
-            ],
-            answer: 2, hint: "The .git folder stores ALL tracking data. What happens when you remove the brain?"
+            type: "terminal",
+            prompt: "Prepare your project! Set up the Git 'Brain' now.",
+            steps: [
+                {
+                    instruction: "Initialize the repository",
+                    expectedCommand: "git init",
+                    successMessage: "Brain created! The .git folder is now watching.",
+                    hint: "Type: git init"
+                }
+            ]
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: ".git/", status: "system" }, { name: ".git/config", status: "system" }, { name: ".git/HEAD", status: "system" }] }
+        initialState: { commits: [], branches: [], head: null, files: [] },
+        resultState: {
+            commits: [], branches: ["main"], head: "main",
+            files: [{ name: ".git/", status: "system" }]
+        }
     },
     {
-        id: 4, module: "Core Concepts & Setup", title: "Installing Git",
-        icon: "💻", xp: 50,
-        content: "Before using Git, you need to install it on your computer. Here's how for each operating system:\n\nWindows:\nDownload the installer from git-scm.com. Choose the 64-bit version (most common). Run the installer and accept the default settings.\n\nmacOS:\nOpen Terminal and type `brew install git` (requires Homebrew), or download from git-scm.com.\n\nLinux (Ubuntu/Debian):\nOpen Terminal and type `sudo apt-get install git`.\n\nAfter installing, you can verify it worked by opening a terminal and typing:\n\n`git --version`\n\nThis should print something like `git version 2.42.0`. If you see a version number, Git is installed and ready to use!",
-        explanation: "Git is a command-line tool that runs in your terminal (Command Prompt on Windows, Terminal on Mac/Linux). While graphical tools exist, learning the command line gives you the deepest understanding and the most control.",
+        id: 5, module: "Module 1: Fundamentals", title: "Configuring Your Identity",
+        icon: "🪪", xp: 100,
+        content: "Every commit in history needs an author. Git won't let you save your 'roast' secrets without signing your work first! \n\nYou must configure your name and email using these commands:\n• `git config --global user.name \"Your Name\"` \n• `git config --global user.email \"you@example.com\"` \n\nThis is a one-time setup that attaches your digital signature to every project you touch.",
+        explanation: "Pro Git 1.6: These settings live in your `.gitconfig` file. Use the `--global` flag to set them once for your entire computer.",
         challenge: {
-            type: "quiz", question: "How do you verify that Git is installed correctly?",
-            options: [
-                "Open the Git website",
-                "Type 'git --version' in the terminal",
-                "Check your Applications folder",
-                "Restart your computer"
-            ],
-            answer: 1, hint: "There's a specific command you type in the terminal to check..."
-        },
-        initialState: { commits: [], branches: [], head: null, files: [] }
-    },
-    {
-        id: 5, module: "Core Concepts & Setup", title: "Configuring Your Identity",
-        icon: "🪪", xp: 75,
-        content: "After installing Git, the FIRST thing you must do is tell Git who you are. This is mandatory because every commit (every save point) records who made it.\n\nYou need to set two things — your name and your email:\n\n`git config --global user.name \"Your Name\"`\n`git config --global user.email \"you@example.com\"`\n\nThe `--global` flag means this setting applies to ALL your Git projects on this computer. Without `--global`, the setting would only apply to the current project.\n\nThis is a one-time setup! Once configured, Git remembers your identity for every future project.",
-        explanation: "Your Git identity is attached to every commit you make. When you work on a team, this is how everyone knows who changed what. It's like signing your name on every page of a shared notebook.",
-        challenge: {
-            type: "terminal", prompt: "Set your Git username — type: git config --global user.name \"Your Name\"",
-            matchPattern: "git config --global user.name",
-            expectedCommand: "git config --global user.name \"Your Name\"",
-            successMessage: "Identity configured! Git now knows who you are. Every commit will be attributed to you.",
-            hint: "Type: git config --global user.name \"Your Name\" (use any name you like)"
+            type: "terminal",
+            prompt: "Tell Git who is brewing this code.",
+            steps: [
+                {
+                    instruction: "Set your global username",
+                    expectedCommand: "git config --global user.name \"Name\"",
+                    matchPattern: "git config --global user.name",
+                    successMessage: "Name set! Now Git knows who the 'Roaster' is.",
+                    hint: "git config --global user.name \"Your Name\""
+                },
+                {
+                    instruction: "Set your global email",
+                    expectedCommand: "git config --global user.email \"you@example.com\"",
+                    matchPattern: "git config --global user.email",
+                    successMessage: "Identity complete! You are ready to record history.",
+                    hint: "git config --global user.email \"you@example.com\""
+                }
+            ]
         },
         initialState: { commits: [], branches: ["main"], head: "main", files: [] },
         resultState: { commits: [], branches: ["main"], head: "main", files: [{ name: ".gitconfig", status: "committed" }] }
     },
-
-    // ─── MODULE 2: THE LOCAL WORKFLOW ───
     {
-        id: 6, module: "The Local Workflow", title: "Initializing a Repository",
-        icon: "🚀", xp: 75,
-        content: "To start tracking a project with Git, you need to initialize a repository. This is always the first step when starting a new project.\n\nNavigate to your project folder in the terminal and type:\n\n`git init`\n\nThis command does one thing: it creates the hidden `.git` folder inside your project. That's it! Your project folder is now a Git repository.\n\nBefore `git init`: Your folder is just a regular folder — Git knows nothing about it.\nAfter `git init`: Git is now watching every change you make inside this folder.\n\nYou only need to run `git init` once per project, at the very beginning.",
-        explanation: "Think of git init as flipping a switch that turns on Git's tracking camera. From this moment on, Git can see every file you create, edit, or delete. But remember — seeing changes and SAVING them are different things (that's where add and commit come in).",
+        id: 6, module: "Module 1: Fundamentals", title: "The Power of 'Status'",
+        icon: "🔎", xp: 50,
+        content: "`git status` is the most important command you'll ever learn. It's your compass. It tells you exactly what Git is seeing in your folder right now.\n\nThink of it as looking at your desk before you start work. In the terminal, files shown in **Red** are untracked — Git knows they exist but isn't watching them yet.",
+        explanation: "Running git status frequently prevents mistakes. It's the ultimate 'What did I just do?' tool.",
         challenge: {
-            type: "terminal", prompt: "Initialize a new Git repository — type: git init",
-            expectedCommand: "git init",
-            successMessage: "Repository initialized! Notice the .git folder has been created. Git is now tracking this project.",
-            diffData: [
-                "--- /dev/null",
-                "+++ .git/",
-                "@@ -0,0 +1 @@",
-                "+(Initial Git repository created)"
+            type: "terminal",
+            prompt: "Audit your current work state to see the new recipe.",
+            steps: [
+                {
+                    instruction: "Check the status of your folder",
+                    expectedCommand: "git status",
+                    successMessage: "Perfect! See the 'recipe.md' in red? That's an untracked file.",
+                    hint: "git status"
+                }
+            ]
+        },
+        initialState: {
+            commits: [],
+            branches: ["main"], head: "main",
+            files: [{ name: "recipe.md", status: "untracked" }]
+        }
+    },
+    {
+        id: 7, module: "Module 1: Fundamentals", title: "Recording Your First Roast",
+        icon: "🖍️", xp: 100,
+        content: "Now that you've seen that 'Red' file in your status, it's time for the real work. To save it, you must perform the **Two-Step Shuffle**:\n\n1. **Add**: Move it to the Staging area (the shipping box) using `git add recipe.md`.\n2. **Commit**: Seal the box and put it in the Vault using `git commit -m \"Your message\"`.",
+        explanation: "Pro Git 2.2: Recording changes to the repository. Note how files transition through the Three Stages.",
+        challenge: {
+            type: "terminal",
+            prompt: "Seal your secret recipe into the vault.",
+            steps: [
+                {
+                    instruction: "Stage the recipe file",
+                    expectedCommand: "git add recipe.md",
+                    successMessage: "Boxed! The file is now in the Staging area.",
+                    hint: "git add recipe.md"
+                },
+                {
+                    instruction: "Commit with a message",
+                    expectedCommand: "git commit -m \"Initial recipe\"",
+                    matchPattern: "git commit -m",
+                    successMessage: "History recorded! You've made your first snapshot.",
+                    hint: "git commit -m \"Initial recipe\""
+                }
+            ]
+        },
+        initialState: {
+            commits: [], branches: ["main"], head: "main",
+            files: [{ name: "recipe.md", status: "untracked" }]
+        },
+        resultState: {
+            commits: [{ id: "c1", msg: "Initial recipe", branch: "main", marker: "The Big Bang", milestone: true }],
+            branches: ["main"], head: "main",
+            files: [{ name: "recipe.md", status: "committed" }]
+        }
+    },
+    {
+        id: 8, module: "Module 1: Fundamentals", title: "Shortcuts: Staging All",
+        icon: "⚡", xp: 75,
+        content: "In large projects, manually adding 50 files one by one is painful. Git provides shortcuts to stage multiple changes at once.\n\n• `git add .` : Stage everything in your current folder.\n• `git add --all` : Stage every change in the entire project.\n• `git add *.css` : Stage all CSS files.\n\nUse these carefully! Don't accidentally stage your private notes.",
+        explanation: "Pro Git 2.2: Tracking new files. The `.` refers to the current directory.",
+        challenge: {
+            type: "terminal",
+            prompt: "Clean up the desk! Stage all files.",
+            steps: [
+                {
+                    instruction: "Stage everything at once",
+                    expectedCommand: "git add .",
+                    acceptAlso: ["git add --all", "git add -A"],
+                    successMessage: "All files boxed and ready for shipping!",
+                    hint: "git add ."
+                }
+            ]
+        },
+        initialState: {
+            commits: [{ id: "c1", msg: "Initial commit", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: [
+                { name: "index.html", status: "modified" },
+                { name: "style.css", status: "untracked" },
+                { name: "beans.jpg", status: "untracked" }
+            ]
+        },
+        resultState: {
+            commits: [{ id: "c1", msg: "Initial commit", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: [
+                { name: "index.html", status: "staged" },
+                { name: "style.css", status: "staged" },
+                { name: "beans.jpg", status: "staged" }
+            ]
+        }
+    },
+    {
+        id: 9, module: "Module 1: Fundamentals", title: "The Commit Message Guide",
+        icon: "📝", xp: 50,
+        content: "A commit message is a letter to your future self. 'Fixed stuff' is a terrible letter. 'Add validation to the coffee bean counter' is a great one.\n\n### The Golden Rules:\n1. Be concise but descriptive.\n2. Use the imperative mood (e.g., 'Add feature' not 'Added feature').\n3. Imagine your teammate reading this 6 months from now.",
+        explanation: "Good commit messages make `git log` readable. Your history should read like a story of progress.",
+        challenge: {
+            type: "quiz", question: "Which of these is considered a 'Best Practice' commit message?",
+            options: [
+                "bug fix",
+                "Fix: resolve bean overflow in local roaster",
+                "I finally fixed the annoying bug that was making the coffee taste like dirt",
+                "updated code"
             ],
-            hint: "Type exactly: git init"
+            answer: 1, hint: "Look for the one that provides context without being a novel."
         },
-        initialState: { commits: [], branches: [], head: null, files: [] },
-        resultState: { commits: [], branches: ["main"], head: "main", files: [{ name: ".git/", status: "system" }, { name: ".git/config", status: "system" }, { name: ".git/HEAD", status: "system" }] }
+        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
-        id: 7, module: "The Local Workflow", title: "Checking File Status",
-        icon: "🔍", xp: 75,
-        content: "Now that Git is tracking your project, how do you know what's going on? The `git status` command is your best friend — it shows you the current state of ALL your files.\n\nType this command anytime to see what's happening:\n\n`git status`\n\nGit status will show you files in three categories:\n\n• Untracked files (red): New files Git has never seen before. Git notices them but isn't tracking them yet.\n• Modified files (red): Files that existed before but have been changed since the last commit.\n• Staged files (green): Files that are ready to be committed (saved permanently).\n\nThink of `git status` as asking Git: \"Hey, what's changed since the last save?\" You'll use this command constantly — it's the most frequently used Git command!",
-        explanation: "Get into the habit of running git status before AND after every operation. It's your sanity check — it tells you exactly where things stand, what's been staged, and what hasn't been tracked yet. When in doubt, git status!",
+        id: 10, module: "Module 1: Fundamentals", title: "Summary: The Local Heartbeat",
+        icon: "🏁", xp: 100,
+        content: "You've mastered the 'Local Heartbeat' of Git. Every developer, from startups to Google, uses this exact cycle:\n\n1. **Edit**: Open your code and break things.\n2. **Status**: Check what's broken.\n3. **Add**: Choose what to save.\n4. **Commit**: Save the history.\n\nReady to move to branching? Let's go!",
+        explanation: "This cycle is the foundation. Master it, and you're 50% of the way to being a Git pro.",
         challenge: {
-            type: "terminal", prompt: "Check the current status of your files — type: git status",
-            expectedCommand: "git status",
-            successMessage: "Status displayed! You can see which files are modified, staged, and untracked.",
-            hint: "Type exactly: git status"
+            type: "terminal",
+            prompt: "Finish Module 1 with a clean commit.",
+            steps: [
+                {
+                    instruction: "Check the status first",
+                    expectedCommand: "git status",
+                    successMessage: "Good habit! See your modified files.",
+                    hint: "git status"
+                },
+                {
+                    instruction: "Stage the final progress",
+                    expectedCommand: "git add .",
+                    successMessage: "Finalizing...",
+                    hint: "git add ."
+                },
+                {
+                    instruction: "Commit Module 1 completion",
+                    expectedCommand: "git commit -m \"Complete Module 1\"",
+                    matchPattern: "git commit -m",
+                    successMessage: "MODULE 1 COMPLETE! 🎉 You've learned the fundamentals of professional version control.",
+                    hint: "git commit -m \"Complete Module 1\""
+                }
+            ]
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "modified" }, { name: "style.css", status: "untracked" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "modified" }, { name: "style.css", status: "untracked" }] }
-    },
-    {
-        id: 8, module: "The Local Workflow", title: "Staging Files",
-        icon: "📦", xp: 100,
-        content: "Remember the shipping analogy? Staging is like putting items into the box before sealing it. You're telling Git: \"These are the changes I want to save.\"\n\nThe command to stage files is `git add`. There are several ways to use it:\n\n`git add index.html` — Stage one specific file\n`git add .` — Stage ALL changes in the current directory and subdirectories\n`git add --all` or `git add -A` — Stage ALL changes in the entire project\n\nWhich one should you use?\n• Use `git add filename` when you want to be precise about what to save.\n• Use `git add .` when you want to save everything you've changed.\n\nAfter staging, the file moves from red (unstaged) to green (staged) when you run `git status`.\n\nLet's practice! Stage the index.html file:\n\n`git add index.html`",
-        explanation: "Staging gives you surgical control over your commits. Imagine you fixed a bug AND started a new feature — you can stage just the bug fix, commit it, then stage the feature separately. This keeps your project history clean and organized.",
-        challenge: {
-            type: "terminal", prompt: "Stage the index.html file — type: git add index.html",
-            expectedCommand: "git add index.html",
-            acceptAlso: ["git add ."],
-            successMessage: "File staged! index.html has moved from 'modified' (red) to 'staged' (green). It's now ready to be committed.",
-            hint: "Type: git add index.html"
+        initialState: {
+            commits: [{ id: "c1", msg: "Initial commit", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: [{ name: "module1_notes.md", status: "modified" }]
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "modified" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "staged" }] }
-    },
-    {
-        id: 9, module: "The Local Workflow", title: "Your First Commit",
-        icon: "🎯", xp: 100,
-        content: "A commit is a permanent snapshot of your project at a specific moment. Think of it as pressing 'Save' in a video game — you can always come back to this exact state.\n\nTo create a commit, you use:\n\n`git commit -m \"Your message here\"`\n\nLet's break this down:\n• `git commit` — tells Git to save the staged changes\n• `-m` — stands for \"message\" (a shortcut to write the message inline)\n• `\"Your message here\"` — a short description of WHAT you changed and WHY\n\nGood commit messages are crucial! They're like breadcrumbs that help you (and your team) understand the project's history. Examples:\n• ✅ Good: \"Add login form validation\"\n• ✅ Good: \"Fix navbar disappearing on mobile\"\n• ❌ Bad: \"stuff\"\n• ❌ Bad: \"changes\"\n\nWe've already staged index.html for you. Now create your first commit!",
-        explanation: "Each commit gets a unique ID (called a hash), records who made it, when, and what changed. Commits are the building blocks of Git history — they're what make time travel possible. Write messages that your future self will thank you for!",
-        challenge: {
-            type: "terminal", prompt: "Create your first commit — type: git commit -m \"your message\"",
-            matchPattern: "git commit -m",
-            expectedCommand: "git commit -m \"Initial commit\"",
-            acceptAlso: ["git commit -m 'Initial commit'"],
-            successMessage: "Your first commit! A new snapshot has been saved. Look at the commit graph — a new node appeared!",
-            hint: "Type: git commit -m \"Initial commit\" (you can use any message you like)"
-        },
-        initialState: { commits: [], branches: ["main"], head: "main", files: [{ name: "index.html", status: "staged" }] },
         resultState: {
             commits: [
-                { id: "a1b2c3", msg: "Initial commit", branch: "main", marker: "First Roast", milestone: true, storyContext: "You've officially sealed the first version of your coffee recipe! This is a solid point you can always return to if the recipe goes wrong." }
+                { id: "c1", msg: "Initial commit", branch: "main" },
+                { id: "c2", msg: "Complete Module 1", branch: "main", milestone: true, marker: "Fundamentals Mastery" }
             ],
             branches: ["main"], head: "main",
-            files: [{ name: "index.html", status: "committed" }]
+            files: [{ name: "module1_notes.md", status: "committed" }]
+        }
+    },
+
+    // ─── MODULE 2: BRANCHING (Parallel Universes) ───
+    {
+        id: 11, module: "Module 2: Branching", title: "Branching: Multiple Universes",
+        icon: "🌿", xp: 100,
+        content: "Imagine your coffee shop is stable and profitable. You want to experiment with a 'Spicy Pumpkin Latte', but if it tastes terrible, you don't want to ruin your main menu.\n\nIn Git, a **Branch** is a pointer to a specific commit. By creating a branch, you create a 'Parallel Universe'. You can experiment freely, and if it works, you bring it home (Merge). If not, you delete the universe and no one ever knows.",
+        explanation: "Pro Git 3.1: A branch in Git is simply a lightweight movable pointer to one of these commits. The default branch name in Git is 'main'.",
+        challenge: {
+            type: "quiz", question: "What is the primary benefit of using branches?",
+            options: [
+                "It makes the files smaller",
+                "It allows you to work on new features without affecting the stable code",
+                "It automatically fixes bugs for you",
+                "It speeds up git push"
+            ],
+            answer: 1, hint: "Side kitchens and experimental menus — why isolate them?"
+        },
+        initialState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 12, module: "Module 2: Branching", title: "Creating Your Side Kitchen",
+        icon: "🔀", xp: 100,
+        content: "Let's create that experiment branch. You use `git branch [name]` to create the pointer.\n\nNote: Creating a branch **does not** switch you to it. You're still in the 'Main Kitchen' until you step into the new one.",
+        explanation: "Pro Git 3.2: Basic Branching. Git creates a new pointer at the same commit you're currently on.",
+        challenge: {
+            type: "terminal",
+            prompt: "Create a branch for your experiments.",
+            steps: [
+                {
+                    instruction: "Create the 'experiment' branch",
+                    expectedCommand: "git branch experiment",
+                    successMessage: "Branch created! It's invisible for now, but the pointer exists.",
+                    hint: "git branch experiment"
+                },
+                {
+                    instruction: "List all branches to see it",
+                    expectedCommand: "git branch",
+                    successMessage: "There it is! Notice the * is still on main.",
+                    hint: "git branch"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main", "experiment"], head: "main", files: [] }
+    },
+    {
+        id: 13, module: "Module 2: Branching", title: "Stepping into the Lab",
+        icon: "🚪", xp: 75,
+        content: "To switch between branches, we use `git checkout`. Think of it as walking through a door into a different room.\n\nIn the 'Experiment' room, you can change files, and the 'Main' room stays exactly as it was.",
+        explanation: "Pro Git 3.2: Switching branches moves the HEAD pointer to the new branch and updates the files in your working directory.",
+        challenge: {
+            type: "terminal",
+            prompt: "Switch to your new experiment branch.",
+            steps: [
+                {
+                    instruction: "Checkout the experiment branch",
+                    expectedCommand: "git checkout experiment",
+                    acceptAlso: ["git switch experiment"],
+                    successMessage: "You are now in the experiment universe!",
+                    hint: "git checkout experiment"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main", "experiment"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main", "experiment"], head: "experiment", files: [] }
+    },
+    {
+        id: 14, module: "Module 2: Branching", title: "The Fast-Track Shortcut",
+        icon: "🏃", xp: 50,
+        content: "Developers are lazy (in a good way). Instead of two commands (`branch` then `checkout`), we use one: `git checkout -b [name]`.\n\nThis is the most common way branches are born.",
+        explanation: "The -b flag stands for 'branch'. It tells Git: 'Create this branch AND move me there immediately.'",
+        challenge: {
+            type: "terminal",
+            prompt: "Create and switch to a 'latte-art' branch in one go.",
+            steps: [
+                {
+                    instruction: "Create and switch shortcut",
+                    expectedCommand: "git checkout -b latte-art",
+                    acceptAlso: ["git switch -c latte-art"],
+                    successMessage: "Boom! Created and switched instantly.",
+                    hint: "git checkout -b latte-art"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main", "latte-art"], head: "latte-art", files: [] }
+    },
+    {
+        id: 15, module: "Module 2: Branching", title: "Merging the Success",
+        icon: "🤝", xp: 125,
+        content: "The 'Spicy Pumpkin' was a hit! Now we want to move it to the **Main Menu**.\n\n1. Go to the receiving branch (`main`).\n2. Pull the changes in (`merge`).\n\nIf the paths are linear, Git does a **Fast-Forward** — it just slides the 'main' pointer up to the 'experiment' pointer.",
+        explanation: "Pro Git 3.2: Basic Merging. A merge takes two snapshots and finds a common ancestor to combine them.",
+        challenge: {
+            type: "terminal",
+            prompt: "Bring your experiment into the main branch.",
+            steps: [
+                {
+                    instruction: "Switch back to main first",
+                    expectedCommand: "git checkout main",
+                    successMessage: "Back in the main kitchen.",
+                    hint: "git checkout main"
+                },
+                {
+                    instruction: "Merge the experiment",
+                    expectedCommand: "git merge experiment",
+                    successMessage: "Success! Main now has the new roast.",
+                    hint: "git merge experiment"
+                }
+            ]
+        },
+        initialState: {
+            commits: [
+                { id: "c1", msg: "Base roast", branch: "main" },
+                { id: "c2", msg: "Add pumpkin spice", branch: "experiment" }
+            ],
+            branches: ["main", "experiment"], head: "experiment", files: []
+        },
+        resultState: {
+            commits: [
+                { id: "c1", msg: "Base roast", branch: "main" },
+                { id: "c2", msg: "Add pumpkin spice", branch: "main" }
+            ],
+            branches: ["main", "experiment"], head: "main", files: []
         }
     },
     {
-        id: 10, module: "The Local Workflow", title: "Staging Strategies",
-        icon: "🧠", xp: 75,
-        content: "Now that you know how staging works, let's explore the different strategies:\n\n`git add .` (dot)\nStages everything in the CURRENT directory and its subdirectories. If you're in the root of your project, this stages everything.\n\n`git add --all` or `git add -A`\nStages ALL changes across the ENTIRE project, no matter where you are in the directory structure. This also stages deleted files.\n\n`git add filename`\nStages only the specified file. This is the most precise option.\n\n`git add *.css`\nStages all files matching a pattern (in this case, all CSS files).\n\nWhich strategy should you use? It depends:\n• Working alone on a small project? `git add .` is usually fine.\n• Working on a team? Stage files individually with `git add filename` for cleaner commits.\n• Want to include deleted files? Use `git add --all`.",
-        explanation: "The staging area is one of Git's most powerful features. It exists specifically so you can craft meaningful commits. Instead of saving everything at once, you can group related changes together — making your project history a readable story rather than random noise.",
+        id: 16, module: "Module 2: Branching", title: "Conflict: The Dual Roast",
+        icon: "💥", xp: 150,
+        content: "What happens if you change the brew time to 5 mins on `main` and someone else changes it to 7 mins on `branch`?\n\nGit pauses and says: **'Merge Conflict'**. It doesn't know which brew is better. It's your job to pick the winner and clean up the markers.",
+        explanation: "Pro Git 3.2: Basic Merge Conflicts. Git places markers (<<<<<<<, =======, >>>>>>>) in the code to show the competing changes.",
         challenge: {
-            type: "quiz", question: "What is the difference between 'git add .' and 'git add --all'?",
+            type: "quiz", question: "What should you do when a merge conflict occurs?",
             options: [
-                "They are exactly the same",
-                "'git add .' stages the current directory; 'git add --all' stages the entire project including deletions",
-                "'git add .' is faster than 'git add --all'",
-                "'git add --all' only works on new files"
+                "Delete the repository and start over",
+                "Wait for the other developer to fix it",
+                "Manually edit the file, choose the correct lines, remove markers, and commit",
+                "Git automatically picks the newest one"
             ],
-            answer: 1, hint: "Think about scope — one is relative to where you are, the other covers everything."
+            answer: 2, hint: "Git is a tool, but you are the judge."
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "modified" }, { name: "style.css", status: "untracked" }, { name: "app.js", status: "modified" }] }
+        initialState: { commits: [{ id: "c1", msg: "Split commit", branch: "main" }], branches: ["main", "branch"], head: "main", files: [] }
     },
     {
-        id: 11, module: "The Local Workflow", title: "File Deletion with git rm",
-        icon: "🗑️", xp: 75,
-        content: "Sometimes you need to remove files from your project. But simply deleting a file from your computer isn't enough — you also need to tell Git to stop tracking it.\n\nThe `git rm` command does both at once: it deletes the file AND stages the deletion for the next commit.\n\n`git rm filename` — Delete a file and stage the removal\n`git rm -r foldername` — Recursively delete a folder and all its contents\n`git rm -f filename` — Force delete a file even if it has uncommitted changes\n\nImportant: After running `git rm`, you still need to run `git commit` to make the deletion permanent in your history.\n\nLet's practice removing the old.txt file that's no longer needed:\n\n`git rm old.txt`",
-        explanation: "If you just delete a file normally (without git rm), Git will show it as 'deleted' in git status but won't stage the deletion for you. You'd then need to run 'git add' on the deleted file separately. git rm is the shortcut that handles both steps.",
+        id: 17, module: "Module 2: Branching", title: "Cleaning Up: Deleting Branches",
+        icon: "🧹", xp: 50,
+        content: "Once a branch is merged, the 'Side Kitchen' is just taking up space. It's time to tear it down.\n\nUse `git branch -d [name]` to delete safely. Git won't let you delete an unmerged branch unless you use the 'Force' (`-D`).",
+        explanation: "Housekeeping is essential for long-term projects. Stale branches clutter the visualization and confuse the team.",
         challenge: {
-            type: "terminal", prompt: "Remove the old.txt file from the project — type: git rm old.txt",
-            expectedCommand: "git rm old.txt",
-            successMessage: "File removed and deletion staged! The file is gone from your working directory and Git knows about it.",
-            diffData: [
-                "--- a/old.txt",
-                "+++ /dev/null",
-                "@@ -1 +0,0 @@",
-                "-This file is no longer needed."
-            ],
-            hint: "Type: git rm old.txt"
+            type: "terminal",
+            prompt: "Delete the finished 'experiment' branch.",
+            steps: [
+                {
+                    instruction: "Delete the branch",
+                    expectedCommand: "git branch -d experiment",
+                    successMessage: "Kitchen cleared! The pointer is gone.",
+                    hint: "git branch -d experiment"
+                }
+            ]
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add project files", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "old.txt", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add project files", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }] }
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main", "experiment"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
-        id: 12, module: "The Local Workflow", title: "Removing from Tracking",
-        icon: "👁️‍🗨️", xp: 75,
-        content: "What if you accidentally started tracking a file you shouldn't have? For example, a file with passwords, API keys, or large binary files?\n\nYou don't want to delete the file — you just want Git to STOP tracking it. That's what `--cached` does:\n\n`git rm --cached secrets.txt`\n\nThis removes the file from Git's tracking (the staging area) but keeps the actual file on your computer. The file becomes \"untracked\" again — Git pretends it doesn't exist.\n\nThis is especially useful for:\n• Files with sensitive data (passwords, API keys)\n• Large files that shouldn't be in version control\n• IDE configuration files (like .idea/ or .vscode/)\n• Files you forgot to add to .gitignore\n\nLet's remove secrets.txt from tracking while keeping the actual file:",
-        explanation: "The --cached flag is a lifesaver when you realize you've committed something you shouldn't have. Combined with a .gitignore file (which tells Git to permanently ignore certain files), it's the proper way to handle sensitive or unnecessary files.",
+        id: 18, module: "Module 2: Branching", title: "Rebasing: Linear History",
+        icon: "📏", xp: 150,
+        content: "Merging creates a 'Merge Commit' which can look like a messy spiderweb. **Rebasing** takes your changes and 'replays' them on top of the newest work.\n\nBy running `git rebase main`, you're effectively saying: 'Take my work and move it to the very tip of the current main branch.' It makes your history look like one straight line. It's cleaner, but it's like rewriting time — use with caution!",
+        explanation: "Pro Git 3.6: Rebasing. Rebasing re-reads the changes from your branch and applies them to the current HEAD of another branch.",
         challenge: {
-            type: "terminal", prompt: "Stop tracking secrets.txt (keep the file) — type: git rm --cached secrets.txt",
-            expectedCommand: "git rm --cached secrets.txt",
-            successMessage: "File removed from tracking! Git will now ignore secrets.txt, but the file still exists on your computer.",
-            diffData: [
-                "--- a/secrets.txt",
-                "+++ /dev/null",
-                "@@ -1 +0,0 @@",
-                "-API_KEY=5f3e9c..."
-            ],
-            hint: "Type: git rm --cached secrets.txt"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "secrets.txt", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "secrets.txt", status: "untracked" }] }
-    },
-    {
-        id: 13, module: "The Local Workflow", title: "Viewing Commit History",
-        icon: "📜", xp: 75,
-        content: "Every commit you make is saved in Git's history. To see this history, use the `git log` command.\n\n`git log` — Shows the full commit history with details (hash ID, author, date, message)\n`git log --oneline` — Shows a compact, one-line-per-commit summary\n\nThe full `git log` shows each commit with:\n• A unique commit hash (like a fingerprint — e.g., a1b2c3d)\n• The author's name and email\n• The date and time\n• The commit message\n\nThe `--oneline` format is more practical for quick browsing — it shows just the short hash and the message on one line.\n\nLook at the commit graph on the left — those nodes ARE your commit history! Let's view it in the terminal:\n\n`git log --oneline`",
-        explanation: "git log is your window into the project's past. The --oneline flag is great for a quick overview, but the full log gives you all the details you need for debugging or understanding who changed what and when.",
-        challenge: {
-            type: "terminal", prompt: "View the commit history in compact format — type: git log --oneline",
-            expectedCommand: "git log --oneline",
-            acceptAlso: ["git log"],
-            successMessage: "History displayed! Each line shows a shortened hash and commit message. These are the snapshots of your project.",
-            hint: "Type: git log --oneline"
-        },
-        initialState: { commits: [{ id: "a1b2c3", msg: "Initial commit", branch: "main" }, { id: "d4e5f6", msg: "Add homepage", branch: "main" }, { id: "g7h8i9", msg: "Add styling", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "style.css", status: "committed" }] },
-        resultState: { commits: [{ id: "a1b2c3", msg: "Initial commit", branch: "main" }, { id: "d4e5f6", msg: "Add homepage", branch: "main" }, { id: "g7h8i9", msg: "Add styling", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "style.css", status: "committed" }] }
-    },
-    {
-        id: 14, module: "The Local Workflow", title: "Comparing Changes with git diff",
-        icon: "🔎", xp: 75,
-        content: "Before committing, you often want to see EXACTLY what changed in your files. The `git diff` command shows you line-by-line differences.\n\n`git diff` — Shows unstaged changes (what's different between your working directory and the staging area)\n`git diff --staged` — Shows staged changes (what will be included in the next commit)\n`git diff commit1 commit2` — Compares two specific commits\n\nThe output uses colors:\n• Lines in RED (prefixed with -) are lines that were REMOVED\n• Lines in GREEN (prefixed with +) are lines that were ADDED\n• Lines without a prefix are unchanged context\n\nExample output:\n`-  <h1>Hello World</h1>`\n`+  <h1>Hello Git!</h1>`\n\nThis tells you the heading text was changed from \"Hello World\" to \"Hello Git!\".",
-        explanation: "git diff is like a magnifying glass for your changes. Use it before committing to double-check your work. It's especially useful when you've been working for hours and need to remember exactly what you changed before creating a commit.",
-        challenge: {
-            type: "quiz", question: "In git diff output, what do red lines (prefixed with -) represent?",
+            type: "quiz", question: "What is the main advantage of Rebasing over Merging?",
             options: [
-                "New lines that were added",
-                "Lines that were removed or replaced",
-                "Lines with errors",
-                "Lines that haven't been changed"
+                "It is faster than merging",
+                "It avoids merge conflicts entirely",
+                "It creates a clean, linear project history without merge commits",
+                "It's the only way to save code"
             ],
-            answer: 1, hint: "Think about what a minus sign means — something was taken away."
+            answer: 2, hint: "Think about how the lines look in the graph — a web or a straight line?"
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add content", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "modified" }] }
+        initialState: { commits: [{ id: "c1", msg: "Split", branch: "main" }], branches: ["main", "feature"], head: "feature", files: [] }
     },
     {
-        id: 15, module: "The Local Workflow", title: "Local Workflow Review",
-        icon: "🎓", xp: 100,
-        content: "Let's review everything you've learned about the local Git workflow! Here's the complete cycle:\n\n1. `git init` — Start tracking a project (once per project)\n2. Edit your files — Work normally in your editor\n3. `git status` — Check what has changed\n4. `git add filename` — Stage the changes you want to save\n5. `git commit -m \"message\"` — Permanently save the staged changes\n6. `git log --oneline` — View your commit history\n\nThis cycle repeats over and over: edit → status → add → commit → repeat.\n\nAdditional commands you learned:\n• `git rm filename` — Delete a file and stage the deletion\n• `git rm --cached filename` — Stop tracking a file without deleting it\n• `git diff` — See what changed line by line\n\nRemember: `git status` is your best friend. Use it constantly to stay oriented!",
-        explanation: "This edit-stage-commit workflow is the heartbeat of every Git project. Whether you're working alone or on a team of 100, these are the commands you'll use every single day. Master this cycle and you've mastered the foundation of Git.",
+        id: 19, module: "Module 2: Branching", title: "Cherry Picking",
+        icon: "🍒", xp: 125,
+        content: "Sometimes you don't want the whole branch, just **one specific commit**. Maybe just the 'Better Cup Design' from a messy experiment.\n\n`git cherry-pick [hash]` grabs that one commit and brings it into your current branch.",
+        explanation: "This is perfect for hotfixes or grabbing individual features from discarded branches.",
         challenge: {
-            type: "quiz", question: "What is the correct sequence to save changes in Git?",
-            options: [
-                "git commit → git add → git status",
-                "git add → git status → git commit",
-                "git status → git add → git commit",
-                "git init → git commit → git add"
+            type: "terminal",
+            prompt: "Grab the specific 'Fix typo' commit (id: a1b2) into main.",
+            steps: [
+                {
+                    instruction: "Cherry-pick the fix",
+                    expectedCommand: "git cherry-pick a1b2",
+                    successMessage: "Just the cherry! You've grabbed the single fix successfully.",
+                    hint: "git cherry-pick a1b2"
+                }
+            ]
+        },
+        initialState: {
+            commits: [
+                { id: "c1", msg: "Base", branch: "main" },
+                { id: "a1b2", msg: "Fix typo", branch: "feature" }
             ],
-            answer: 2, hint: "Think about the logical order: first check what changed, then prepare it, then save it."
+            branches: ["main", "feature"], head: "main", files: []
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "style.css", status: "staged" }, { name: "app.js", status: "modified" }] }
-    },
-
-    // ─── MODULE 3: FIXING MISTAKES ───
-    {
-        id: 16, module: "Fixing Mistakes", title: "Undoing Changes Overview",
-        icon: "⏪", xp: 75,
-        content: "Everyone makes mistakes — that's exactly why Git exists! Git gives you several safety nets depending on WHERE your mistake is:\n\nMistake in the Working Directory (you edited a file badly):\n→ `git restore filename` — Throws away your local changes and reverts the file to the last committed version.\n\nMistake in the Staging Area (you staged something you shouldn't have):\n→ `git restore --staged filename` — Moves the file back from staging to working directory, keeping your changes intact.\n\nMistake in a Commit (you committed something wrong):\n→ `git revert commitID` — Creates a NEW commit that undoes the changes from a previous commit. This is the safest option.\n\nNuclear Option (delete everything since last commit):\n→ `git reset --hard` — ⚠️ DANGEROUS! Deletes ALL local changes permanently. Use only as a last resort.\n\nThe golden rule: The more recent the mistake, the easier it is to fix.",
-        explanation: "Git's undo system is designed so you always have a way to recover. The key is matching the right command to the right situation. When in doubt, prefer 'git revert' because it never destroys history — it just adds a new commit that reverses the change.",
-        challenge: {
-            type: "quiz", question: "You staged a file by mistake. Which command moves it back to the working directory WITHOUT losing your changes?",
-            options: [
-                "git reset --hard",
-                "git restore --staged filename",
-                "git rm filename",
-                "git revert HEAD"
+        resultState: {
+            commits: [
+                { id: "c1", msg: "Base", branch: "main" },
+                { id: "a1b2", msg: "Fix typo", branch: "main" }
             ],
-            answer: 1, hint: "You want to unstage (remove from the staging area) without deleting anything."
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add feature", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "staged" }, { name: "app.js", status: "modified" }] }
+            branches: ["main", "feature"], head: "main", files: []
+        }
     },
     {
-        id: 17, module: "Fixing Mistakes", title: "Restoring Files",
-        icon: "🔄", xp: 75,
-        content: "You've been editing index.html and made a mess of it. You want to throw away all your recent edits and go back to the last saved (committed) version.\n\nThe command to discard working directory changes is:\n\n`git restore index.html`\n\nThis reverts the file to exactly how it looked in the last commit. Your recent edits are permanently discarded.\n\n⚠️ Warning: This is destructive! Once you restore a file, your unsaved changes are gone forever. Git cannot recover them because they were never committed.\n\nUse this when:\n• You broke something and want to start over on that file\n• You were experimenting and want to undo the experiment\n• You accidentally edited the wrong file",
-        explanation: "Think of git restore as an 'undo all' button for a specific file. It's powerful but irreversible — make sure you really want to throw away those changes before running it. If you're unsure, consider committing your current changes first (even as a 'work in progress' commit) before restoring.",
+        id: 20, module: "Module 2: Branching", title: "Stashing: The Emergency Shelf",
+        icon: "📌", xp: 125,
+        content: "You're in the middle of a complex roast when a customer complains about the 'main' coffee. You need to switch branches, but your work is too messy to commit.\n\n`git stash` puts your work on a temporary 'shelf'. You fix the bug, then `git stash pop` to bring your mess back.",
+        explanation: "Pro Git 7.3: Stashing and Cleaning. Useful for context switching when you're not ready for a commit.",
         challenge: {
-            type: "terminal", prompt: "Discard changes to index.html — type: git restore index.html",
-            expectedCommand: "git restore index.html",
-            successMessage: "File restored! index.html has been reverted to its last committed state. Your recent edits have been discarded.",
-            hint: "Type: git restore index.html"
+            type: "terminal",
+            prompt: "Shelf your work to handle an emergency.",
+            steps: [
+                {
+                    instruction: "Stash the mess",
+                    expectedCommand: "git stash",
+                    successMessage: "Safely shelved. Your folder is clean now.",
+                    hint: "git stash"
+                },
+                {
+                    instruction: "Check status to verify cleanliness",
+                    expectedCommand: "git status",
+                    successMessage: "Clean as a whistle. Now go fix that bug!",
+                    hint: "git status"
+                }
+            ]
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "modified" }, { name: "style.css", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "style.css", status: "committed" }] }
+        initialState: {
+            commits: [{ id: "c1", msg: "Base", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: [{ name: "messy_experiment.txt", status: "modified" }]
+        },
+        resultState: {
+            commits: [{ id: "c1", msg: "Base", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: []
+        }
     },
+    // ─── MODULE 3: COLLABORATION (Connect the Kitchens) ───
     {
-        id: 18, module: "Fixing Mistakes", title: "Unstaging Files",
-        icon: "↩️", xp: 75,
-        content: "Oops! You ran `git add` on a file that you didn't mean to stage. No problem — you can unstage it without losing your changes.\n\nThe command to remove a file from the staging area is:\n\n`git restore --staged style.css`\n\nThis moves the file back from the staging area to the working directory. Your changes are still there — they're just no longer queued for the next commit.\n\nThink of it like taking an item back OUT of the shipping box. The item still exists, you just decided not to ship it right now.\n\nYou can also unstage ALL files at once with:\n`git reset` (this unstages everything but keeps all your changes)",
-        explanation: "This is one of the most common Git operations. You'll frequently stage a file, realize you want to make more changes first, unstage it, edit it more, and then stage it again. The staging area is flexible — files can move in and out freely.",
+        id: 21, module: "Module 3: Collaboration", title: "Remote: The Central Cloud Kitchen",
+        icon: "🌐", xp: 100,
+        content: "Up until now, your coffee shop has been a one-person show. But what if you want to open a franchise? Or backup your recipes in case your shop burns down?\n\nA **Remote** is a copy of your repository living on a server (like GitHub). It's the 'Main Hub' where everyone shares their work.",
+        explanation: "Pro Git 2.5: Working with Remotes. Remotes are versions of your project that are hosted on the Internet or network somewhere.",
         challenge: {
-            type: "terminal", prompt: "Unstage style.css (keep changes) — type: git restore --staged style.css",
-            expectedCommand: "git restore --staged style.css",
-            successMessage: "File unstaged! style.css is back in your working directory with all changes intact. It won't be included in the next commit.",
-            hint: "Type: git restore --staged style.css"
+            type: "quiz", question: "What is the industry-standard name for your primary remote repository?",
+            options: ["master", "main", "origin", "cloud"],
+            answer: 2, hint: "It starts with O and means 'beginning/source'."
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "staged" }, { name: "style.css", status: "staged" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "staged" }, { name: "style.css", status: "modified" }] }
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
-        id: 19, module: "Fixing Mistakes", title: "Understanding git reset",
-        icon: "⚠️", xp: 75,
-        content: "The `git reset` command has different power levels, like a volume knob:\n\n`git reset` (no flags)\nUnstages all files. Equivalent to running `git restore --staged` on every file. Your changes are preserved, just moved back to the working directory. Safe to use.\n\n`git reset --soft HEAD~1`\nUndoes the last commit but keeps the changes staged. It's like saying \"I committed too early, let me add more changes first.\" Relatively safe.\n\n`git reset --hard`\n⚠️ DANGEROUS! This is the nuclear option. It deletes ALL uncommitted changes — both staged and unstaged — and resets everything to the last commit. There is NO undo for this.\n\n`git reset --hard HEAD~1`\n⚠️ EXTREMELY DANGEROUS! Deletes the last commit AND all uncommitted changes. The commit is gone from history.\n\nRule of thumb: If working with a team, prefer `git revert` over `git reset` because revert doesn't rewrite history.",
-        explanation: "git reset is powerful but risky. The --hard flag should be used with extreme caution because it permanently destroys work. In professional settings, --hard is generally avoided in favor of git revert, which is safer because it adds history instead of erasing it.",
-        challenge: {
-            type: "quiz", question: "Which git reset option is DANGEROUS and permanently destroys uncommitted changes?",
-            options: [
-                "git reset (no flags)",
-                "git reset --soft",
-                "git reset --hard",
-                "git reset --mixed"
-            ],
-            answer: 2, hint: "The name itself sounds intense — which option is the 'nuclear option'?"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add feature", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "staged" }, { name: "app.js", status: "modified" }] }
-    },
-    {
-        id: 20, module: "Fixing Mistakes", title: "Reverting Commits",
-        icon: "🔙", xp: 100,
-        content: "What if you committed something that broke the project, and other people have already pulled your changes? You can't just delete the commit — that would mess up everyone's history.\n\nThe solution is `git revert`. Instead of deleting the bad commit, it creates a brand NEW commit that does the exact opposite:\n\n`git revert abc1234`\n\n(Replace abc1234 with the actual commit hash from `git log`)\n\nFor example, if commit abc1234 added 3 lines and deleted 1 line, then `git revert abc1234` will delete those 3 lines and re-add that 1 line.\n\nWhy is this better than reset?\n• It doesn't rewrite history — the original commit still exists\n• It's safe to use on shared/public branches\n• Your teammates won't have conflicts\n\nLook at the commit graph — we want to undo the \"Break homepage\" commit. Let's revert it:\n\n`git revert c3d4e5`",
-        explanation: "git revert is the professional way to undo changes. It's transparent — anyone looking at the history can see both the original change and its reversal. This makes debugging easier and keeps the team's history consistent.",
-        challenge: {
-            type: "terminal", prompt: "Revert the bad commit — type: git revert c3d4e5",
-            expectedCommand: "git revert c3d4e5",
-            successMessage: "Commit reverted! A new commit has been created that undoes the changes from the bad commit. The history is preserved.",
-            hint: "Type: git revert c3d4e5"
-        },
-        initialState: { commits: [{ id: "a1b2c3", msg: "Initial commit", branch: "main" }, { id: "b2c3d4", msg: "Add homepage", branch: "main" }, { id: "c3d4e5", msg: "Break homepage", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }] },
-        resultState: { commits: [{ id: "a1b2c3", msg: "Initial commit", branch: "main" }, { id: "b2c3d4", msg: "Add homepage", branch: "main" }, { id: "c3d4e5", msg: "Break homepage", branch: "main" }, { id: "d4e5f6", msg: "Revert \"Break homepage\"", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }] }
-    },
-    // ─── MODULE 4: PARALLEL DEVELOPMENT ───
-    {
-        id: 21, module: "Parallel Development", title: "Understanding Branches",
-        icon: "🌿", xp: 75,
-        content: "Imagine you're a chef with a successful restaurant menu. You want to experiment with new recipes, but you don't want to risk ruining the dishes your customers already love.\n\nSolution? Set up a side kitchen! You experiment there, and only add the new dish to the main menu when it's perfected.\n\nThat's exactly what Git branches do:\n\n• The `main` branch is your main menu — the stable, working version of your project.\n• A feature branch is your side kitchen — an isolated copy where you can experiment freely.\n\nWhen you create a branch, Git copies your current state and lets you make changes without affecting `main`. If your experiment works, you merge it back. If it fails, you delete the branch — no harm done!\n\nKey terms:\n• Branch: An independent line of development\n• HEAD: A pointer that tells Git which branch you're currently on (\"you are here\")\n• main: The default branch created when you initialize a repository",
-        explanation: "Branches are Git's killer feature. They let teams work on multiple features simultaneously without stepping on each other's toes. In a real project, you might have branches for 'feature-login', 'bugfix-navbar', and 'experiment-new-ui' all running at the same time.",
-        challenge: {
-            type: "quiz", question: "What is the purpose of creating a Git branch?",
-            options: [
-                "To delete old code permanently",
-                "To create an isolated environment for development without affecting the main code",
-                "To speed up your computer's performance",
-                "To upload code to GitHub"
-            ],
-            answer: 1, hint: "Think about the kitchen analogy — why would you set up a side kitchen?"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }] }
-    },
-    {
-        id: 22, module: "Parallel Development", title: "Creating Branches",
-        icon: "🔀", xp: 100,
-        content: "Now let's create your first branch! There are two commands to know:\n\n`git branch` — Lists all branches in your project (the current branch has a * next to it)\n`git branch feature-login` — Creates a new branch called 'feature-login'\n\nWhen you create a branch:\n• Git creates a new pointer at your current commit\n• The new branch inherits ALL the history from the current branch\n• You're still on the original branch — creating doesn't switch you\n\nNaming conventions for branches:\n• Features: `feature-login`, `feature-dashboard`\n• Bug fixes: `bugfix-navbar`, `fix-typo`\n• Experiments: `experiment-new-ui`\n\nLet's create a branch called 'feature-login' for our new login page:\n\n`git branch feature-login`",
-        explanation: "Branch names should be descriptive and use hyphens (not spaces). Good names tell your team what's being worked on at a glance. Many teams also include ticket numbers like 'feature/JIRA-123-login'.",
-        challenge: {
-            type: "terminal", prompt: "Create a new branch — type: git branch feature-login",
-            expectedCommand: "git branch feature-login",
-            successMessage: "Branch created! 'feature-login' now exists alongside 'main'. Notice the new branch in the visualization — but you're still on main!",
-            hint: "Type: git branch feature-login"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main", "feature-login"], head: "main", files: [{ name: "index.html", status: "committed" }] }
-    },
-    {
-        id: 23, module: "Parallel Development", title: "Switching Branches",
-        icon: "🔄", xp: 75,
-        content: "Creating a branch doesn't move you there — you need to switch to it! There are two ways:\n\n`git checkout feature-login` — Switch to the feature-login branch\n`git checkout -b new-branch` — Create AND switch to a new branch in one step (shortcut!)\n\nWhen you switch branches:\n• Your working directory instantly changes to match that branch's state\n• Files that exist only on the other branch will appear/disappear\n• HEAD moves to point at the new branch\n\nThe `-b` flag is a popular shortcut that combines `git branch` + `git checkout` into one command.\n\nYou can also see all branches with `git branch` — the one with the * is your current branch.\n\nLet's switch to our feature branch:\n\n`git checkout feature-login`",
-        explanation: "Switching branches is instant — Git just moves files around. Your working directory always reflects the current branch. This is why it's important to commit or stash your changes before switching — otherwise, Git might complain about unsaved work.",
-        challenge: {
-            type: "terminal", prompt: "Switch to the feature branch — type: git checkout feature-login",
-            expectedCommand: "git checkout feature-login",
-            acceptAlso: ["git switch feature-login"],
-            successMessage: "Switched! You're now on 'feature-login'. Notice HEAD has moved to the new branch. Any commits you make now will be on this branch only.",
-            hint: "Type: git checkout feature-login"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main", "feature-login"], head: "main", files: [{ name: "index.html", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main", "feature-login"], head: "feature-login", files: [{ name: "index.html", status: "committed" }] }
-    },
-    {
-        id: 24, module: "Parallel Development", title: "Merging Branches",
+        id: 22, module: "Module 3: Collaboration", title: "Adding a Remote",
         icon: "🔗", xp: 100,
-        content: "Your feature is done and tested on the 'feature-login' branch. Now it's time to bring those changes back into 'main'. This is called merging.\n\nTo merge, you must:\n1. First, switch to the branch you want to merge INTO (the receiving branch)\n2. Then run the merge command\n\nStep 1: `git checkout main` (switch to main)\nStep 2: `git merge feature-login` (merge feature-login INTO main)\n\nGit will combine the changes from 'feature-login' into 'main'. If there are no conflicting changes, Git does this automatically — it's called a \"fast-forward merge.\"\n\nAfter merging, the feature branch's commits become part of main's history. You can then safely delete the feature branch if you're done with it.\n\nLet's merge the feature branch! We're already on main:\n\n`git merge feature-login`",
-        explanation: "Merging is how features go from development to production. In professional workflows, merges often happen through Pull Requests (which we'll cover later) where teammates review the code before it's merged.",
+        content: "To connect your local git to GitHub, you use `git remote add origin [URL]`. \n\n'origin' is just a nickname. Instead of typing the long URL every time, you just say 'origin'.",
+        explanation: "Pro Git 2.5: To add a new remote Git repository as a short name you can reference easily, run `git remote add <shortname> <url>`.",
         challenge: {
-            type: "terminal", prompt: "Merge feature-login into main — type: git merge feature-login",
-            expectedCommand: "git merge feature-login",
-            successMessage: "Merge successful! The changes from 'feature-login' are now part of 'main'. Look at the commit graph — the branch has been integrated.",
-            hint: "Type: git merge feature-login"
+            type: "terminal",
+            prompt: "Connect your shop to the cloud.",
+            steps: [
+                {
+                    instruction: "Add the remote 'origin'",
+                    expectedCommand: "git remote add origin https://github.com/coffee/shop.git",
+                    successMessage: "Remote connected! Your local git now knows where to send the beans.",
+                    hint: "git remote add origin https://github.com/coffee/shop.git"
+                },
+                {
+                    instruction: "Verify the remote connection",
+                    expectedCommand: "git remote -v",
+                    successMessage: "There it is! You see 'fetch' and 'push' URLs for origin.",
+                    hint: "git remote -v"
+                }
+            ]
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Add login form", branch: "feature-login" }], branches: ["main", "feature-login"], head: "main", files: [{ name: "index.html", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Add login form", branch: "main" }], branches: ["main", "feature-login"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "login.html", status: "committed" }] }
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", remotes: { origin: { url: "https://github.com/coffee/shop.git" } }, files: [] }
     },
     {
-        id: 25, module: "Parallel Development", title: "Merge Conflicts",
-        icon: "⚡", xp: 100,
-        content: "Sometimes two branches edit the SAME line of the SAME file differently. When you try to merge, Git doesn't know which version to keep — this is called a merge conflict.\n\nWhen a conflict happens, Git marks the conflicting file like this:\n\n`<<<<<<< HEAD`\n`Your version of the code (current branch)`\n`=======`\n`Their version of the code (incoming branch)`\n`>>>>>>> feature-login`\n\nTo resolve the conflict:\n1. Open the conflicting file in your editor\n2. Find the `<<<<<<<`, `=======`, and `>>>>>>>` markers\n3. Decide which version to keep (or combine both)\n4. Delete the conflict markers\n5. Stage the resolved file: `git add filename`\n6. Commit the resolution: `git commit -m \"Resolve merge conflict\"`\n\nConflicts aren't errors — they're Git asking for your help! It's saying: \"I can't decide, you tell me.\"",
-        explanation: "Merge conflicts are normal, especially in team projects. The key is not to panic. Read both versions carefully, decide what the code should look like, clean up the markers, and commit. With practice, resolving conflicts becomes second nature.",
+        id: 23, module: "Module 3: Collaboration", title: "Cloning: Stealing the Recipes",
+        icon: "📥", xp: 100,
+        content: "What if you see a great coffee shop on GitHub and want to open a local branch of it? You **Clone** it.\n\n`git clone [URL]` downloads the entire history, every branch, and every commit. You get the whole box of beans!",
+        explanation: "Pro Git 2.1: If you want to get a copy of an existing Git repository, the command you need is `git clone`.",
         challenge: {
-            type: "quiz", question: "What should you do AFTER manually resolving a merge conflict in a file?",
-            options: [
-                "Run git merge again",
-                "Delete the file and recreate it",
-                "Stage the file with git add, then commit",
-                "Run git reset --hard"
-            ],
-            answer: 2, hint: "After editing the file to resolve the conflict, you need to tell Git you're done — using the same add + commit cycle."
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Update header", branch: "main" }, { id: "c3", msg: "Change header", branch: "feature" }], branches: ["main", "feature"], head: "main", conflict: true, files: [{ name: "index.html", status: "modified" }] }
-    },
-
-    // ─── MODULE 5: REMOTE COLLABORATION ───
-    {
-        id: 26, module: "Remote Collaboration", title: "Remote Repositories",
-        icon: "🌐", xp: 75,
-        content: "So far, everything we've done has been LOCAL — on your own computer. But what if your hard drive crashes? What if you need to collaborate with teammates?\n\nThat's where remote repositories come in. A remote is a copy of your repository hosted on a server (like GitHub, GitLab, or Bitbucket).\n\nKey concepts:\n\n• `origin` — The default name for your remote repository. When you clone a project or connect to GitHub, Git names that remote 'origin' automatically.\n\n• Remote URL — The web address of the remote repository (like https://github.com/username/myproject.git)\n\n• `git remote -v` — Shows you which remotes are connected and their URLs\n\nThe relationship is:\n• Your local repo → You work here, make commits\n• Remote repo (origin) → Backup & collaboration hub\n\nYou push changes UP to the remote and pull changes DOWN from the remote.",
-        explanation: "Remotes are what make Git a collaboration tool instead of just a local backup system. In most workflows, 'origin' is your primary remote, but you can have multiple remotes (useful for open source projects where you might have your fork AND the original repo).",
-        challenge: {
-            type: "quiz", question: "What does 'origin' refer to in Git?",
-            options: [
-                "The first commit ever made",
-                "The main branch of the repository",
-                "The default name for the remote repository",
-                "Your computer's local storage"
-            ],
-            answer: 2, hint: "When you connect to GitHub, Git gives the remote connection a name. What's the default name?"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", remotes: { origin: { url: "https://github.com/user/repo.git" } }, files: [{ name: "index.html", status: "committed" }] }
-    },
-    {
-        id: 27, module: "Remote Collaboration", title: "Cloning a Repository",
-        icon: "📥", xp: 75,
-        content: "What if you want to work on a project that already exists on GitHub? You don't need to create it from scratch — you can CLONE it!\n\n`git clone` downloads a complete copy of a remote repository to your computer, including ALL its history, branches, and files.\n\n`git clone https://github.com/username/project.git`\n\nWhat happens when you clone:\n1. Git creates a new folder with the project name\n2. Downloads all files and the complete commit history\n3. Automatically sets up 'origin' to point to the source URL\n4. Checks out the default branch (usually 'main')\n\nCloning is different from downloading a ZIP file because:\n• You get the FULL history (every commit ever made)\n• You can push and pull changes to/from the remote\n• You're connected to the project, not just downloading a snapshot\n\nLet's clone a repository:",
-        explanation: "Cloning is usually the first thing you do when joining a team or contributing to an open source project. The clone is a fully independent copy — you can work offline, make commits, and push them back when you're ready.",
-        challenge: {
-            type: "terminal", prompt: "Clone a repository — type: git clone https://github.com/team/project.git",
-            matchPattern: "git clone",
-            expectedCommand: "git clone https://github.com/team/project.git",
-            successMessage: "Repository cloned! You now have a complete local copy with full history. The remote 'origin' is automatically configured.",
-            hint: "Type: git clone https://github.com/team/project.git"
+            type: "terminal",
+            prompt: "Clone the famous 'Latte Art' project.",
+            steps: [
+                {
+                    instruction: "Clone the repo",
+                    expectedCommand: "git clone https://github.com/brewers/latte-art.git",
+                    successMessage: "Downloaded everything! You now have a perfect replica locally.",
+                    hint: "git clone https://github.com/brewers/latte-art.git"
+                }
+            ]
         },
         initialState: { commits: [], branches: [], head: null, files: [] },
-        resultState: { commits: [{ id: "a1b2c3", msg: "Initial commit", branch: "main" }, { id: "d4e5f6", msg: "Add features", branch: "main" }], branches: ["main"], head: "main", remotes: { origin: { url: "https://github.com/team/project.git" } }, files: [{ name: "index.html", status: "committed" }, { name: "README.md", status: "committed" }] }
+        resultState: {
+            commits: [{ id: "c1", msg: "Initial art", branch: "main" }],
+            branches: ["main"], head: "main",
+            remotes: { origin: { url: "https://github.com/brewers/latte-art.git" } },
+            files: [{ name: "tutorial.md", status: "committed" }]
+        }
     },
     {
-        id: 28, module: "Remote Collaboration", title: "Pushing Changes",
+        id: 24, module: "Module 3: Collaboration", title: "Pushing: Shipping the Beans",
         icon: "📤", xp: 100,
-        content: "You've made local commits and want to share them with your team. Pushing uploads your commits to the remote repository.\n\n`git push origin main`\n\nLet's break this down:\n• `git push` — The command to upload\n• `origin` — The name of the remote (where to send it)\n• `main` — The branch to push\n\nImportant rules:\n• You can only push commits, not unstaged or staged changes. Always commit first!\n• If someone else pushed changes that you don't have, Git will reject your push. You'll need to pull first.\n• The first push to a new branch might need: `git push -u origin branch-name` (the `-u` flag sets up tracking)\n\nThe flow is: edit → add → commit → push\n\nLet's push our local commits to GitHub:",
-        explanation: "Pushing is how your work reaches the rest of the team. In many companies, you don't push directly to 'main' — instead, you push to a feature branch and create a Pull Request. But the push command is the same regardless.",
+        content: "You've made some great local commits. Now it's time to share them with the world. You **Push** them up to the remote.\n\n`git push origin main` tells Git: 'Send my `main` branch commits to the remote called `origin`.'",
+        explanation: "Pro Git 2.5: When you have your project at a point that you want to share, you have to push it upstream.",
         challenge: {
-            type: "terminal", prompt: "Push your commits to the remote — type: git push origin main",
-            expectedCommand: "git push origin main",
-            acceptAlso: ["git push"],
-            successMessage: "Push successful! Your commits are now on GitHub. Your team can see your changes.",
-            hint: "Type: git push origin main"
+            type: "terminal",
+            prompt: "Upload your local work to GitHub.",
+            steps: [
+                {
+                    instruction: "Push to main",
+                    expectedCommand: "git push origin main",
+                    successMessage: "Shipment successful! Your commits are now visible to the whole world.",
+                    hint: "git push origin main"
+                }
+            ]
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add feature", branch: "main" }], branches: ["main"], head: "main", remotes: { origin: { url: "https://github.com/user/repo.git" } }, files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add feature", branch: "main" }], branches: ["main"], head: "main", remotes: { origin: { url: "https://github.com/user/repo.git" } }, files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "committed" }] }
+        initialState: {
+            commits: [{ id: "c1", msg: "New roast", branch: "main" }],
+            branches: ["main"], head: "main",
+            remotes: { origin: { url: "https://github.com/coffee/shop.git" } },
+            files: []
+        },
+        resultState: {
+            commits: [{ id: "c1", msg: "New roast", branch: "main" }],
+            branches: ["main"], head: "main",
+            remotes: { origin: { url: "https://github.com/coffee/shop.git", pushed: true } },
+            files: []
+        }
     },
     {
-        id: 29, module: "Remote Collaboration", title: "Fetching & Pulling",
-        icon: "📥", xp: 100,
-        content: "Your teammates have been pushing changes to GitHub while you were working. To get their changes, you have two options:\n\n`git fetch` — Downloads remote changes but does NOT merge them\nThink of it as checking your mailbox. The letters are there, but you haven't opened them yet.\n\n`git pull` — Downloads AND merges remote changes immediately\nThink of it as checking your mailbox AND reading every letter right away.\n\n`git pull` = `git fetch` + `git merge`\n\nWhich should you use?\n• `git pull` — When you want to quickly update and are confident there won't be conflicts\n• `git fetch` — When you want to review what changed before merging (safer on large teams)\n\nBest practice: Always pull before you start working to make sure you have the latest code!\n\nLet's pull the latest changes from the remote:\n\n`git pull origin main`",
-        explanation: "In team environments, always pull before you push. This ensures you have the latest code and reduces merge conflicts. Think of it as checking the shared document before adding your edits — it keeps everyone in sync.",
+        id: 25, module: "Module 3: Collaboration", title: "Fetch vs Pull: The Mailbox",
+        icon: "✉️", xp: 100,
+        content: "Your team has been busy. Sarah added a 'Mocha' recipe to GitHub. \n\n`git fetch` checks the cloud mailbox — it sees the new commits but doesn't touch your local code. \n`git pull` checks the mailbox AND automatically pours the beans into your local kitchen.",
+        explanation: "Pro Git 2.5: `git fetch` only downloads the data to your local repository — it doesn’t automatically merge it. `git pull` is more common for beginners.",
         challenge: {
-            type: "terminal", prompt: "Pull the latest changes — type: git pull origin main",
-            expectedCommand: "git pull origin main",
-            acceptAlso: ["git pull"],
-            successMessage: "Pull complete! You now have the latest changes from the remote. Your local code is up to date.",
-            hint: "Type: git pull origin main"
+            type: "quiz", question: "Which command automatically updates your local files with remote changes?",
+            options: ["git fetch", "git pull", "git merge", "git remote"],
+            answer: 1, hint: "Fetch looks, Pull takes."
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", remotes: { origin: { url: "https://github.com/user/repo.git" } }, files: [{ name: "index.html", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "teammate: Add navbar", branch: "main" }], branches: ["main"], head: "main", remotes: { origin: { url: "https://github.com/user/repo.git" } }, files: [{ name: "index.html", status: "committed" }, { name: "navbar.html", status: "committed" }] }
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
-        id: 30, module: "Remote Collaboration", title: "Pull Requests",
-        icon: "📋", xp: 100,
-        content: "In professional teams, you don't merge directly into 'main'. Instead, you create a Pull Request (PR) — a formal request to merge your branch into another branch.\n\nThe Pull Request workflow:\n\n1. Create a feature branch: `git checkout -b feature-login`\n2. Make your changes, commit them\n3. Push the branch to GitHub: `git push origin feature-login`\n4. On GitHub, click \"New Pull Request\"\n5. Select the \"Base\" branch (main) and \"Compare\" branch (feature-login)\n6. Add a description of your changes\n7. Teammates review your code, leave comments\n8. After approval, click \"Merge Pull Request\"\n\nWhy use Pull Requests?\n• Code Review: Teammates catch bugs before they reach production\n• Discussion: You can discuss implementation decisions\n• Documentation: PRs serve as a record of why changes were made\n• Quality: No code reaches main without at least one review\n\nPRs are a GitHub/GitLab feature, not a Git command — they happen in the web browser.",
-        explanation: "Pull Requests are the backbone of modern software development. Even solo developers use PRs to organize their work and create a paper trail. Most companies require at least one approval before a PR can be merged.",
+        id: 26, module: "Module 3: Collaboration", title: "Pulling the Latest",
+        icon: "🚜", xp: 100,
+        content: "Always stay in sync! If you work on old code, you'll get conflicts. Start every day with a `git pull`.\n\n`git pull origin main` fetches the updates and merges them into your current branch instantly.",
+        explanation: "It is a best practice to 'Pull early, pull often'.",
         challenge: {
-            type: "quiz", question: "What is the PRIMARY purpose of a Pull Request?",
-            options: [
-                "To download code from GitHub",
-                "To allow code review before merging into the main branch",
-                "To delete old branches automatically",
-                "To create a backup of the repository"
+            type: "terminal",
+            prompt: "Get Sarah's new recipes from the cloud.",
+            steps: [
+                {
+                    instruction: "Pull changes",
+                    expectedCommand: "git pull origin main",
+                    successMessage: "Great! You are now in sync with Sarah's latest roast.",
+                    hint: "git pull origin main"
+                }
+            ]
+        },
+        initialState: {
+            commits: [{ id: "c1", msg: "Base", branch: "main" }],
+            branches: ["main"], head: "main",
+            remotes: { origin: { url: "https://github.com/coffee/shop.git" } }
+        },
+        resultState: {
+            commits: [
+                { id: "c1", msg: "Base", branch: "main" },
+                { id: "s1", msg: "Sarah: Add Mocha", branch: "main" }
             ],
-            answer: 1, hint: "Think about what 'Request' means — you're requesting that someone review and approve your changes."
+            branches: ["main"], head: "main",
+            files: [{ name: "mocha.txt", status: "committed" }]
+        }
+    },
+    {
+        id: 27, module: "Module 3: Collaboration", title: "Pull Requests (PRs)",
+        icon: "📃", xp: 100,
+        content: "In professional kitchens, you don't just dump your experimental latte into the main vat. You show it to the Lead Chef first. \n\nA **Pull Request** is a request for a code review. You say: 'Hey team, I've finished the Spicy Pumpkin. Can you check it before I merge it into main?'",
+        explanation: "PRs are a GitHub feature, not a Git command. They facilitate communication and quality control.",
+        challenge: {
+            type: "quiz", question: "What happens during a Pull Request?",
+            options: [
+                "Your computer restarts",
+                "Teammates review your code, leave comments, and then approve the merge",
+                "Git automatically deletes all your bugs",
+                "The code is uploaded to the internet and then deleted"
+            ],
+            answer: 1, hint: "Review and Approval — the keywords of teamwork."
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Add login form", branch: "feature-login" }], branches: ["main", "feature-login"], head: "feature-login", files: [{ name: "index.html", status: "committed" }, { name: "login.html", status: "committed" }] }
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 28, module: "Module 3: Collaboration", title: "The Fork: Your Own Franchise",
+        icon: "🍴", xp: 75,
+        content: "You see a successful 'Starbucks' repo, but you don't have permission to change it. \n\nYou **Fork** it. GitHub creates a total copy under YOUR account. Now it's your franchise, and you can change the logo to 'Green Coffee' as much as you want!",
+        explanation: "Forks are essential for Open Source. You fork a project, improve it, and then send a 'Pull Request' to the original owner.",
+        challenge: {
+            type: "quiz", question: "How is a 'Fork' different from a 'Clone'?",
+            options: [
+                "Fork is on GitHub servers; Clone is on your local computer",
+                "Clone is faster than Fork",
+                "Fork costs money; Clone is free",
+                "There is no difference"
+            ],
+            answer: 0, hint: "Where does the copy live? Cloud or Local?"
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 29, module: "Module 3: Collaboration", title: "Distributed Power",
+        icon: "⚡", xp: 100,
+        content: "The magic of Git is that **Distributed** means every developer has the FULL history. If GitHub explodes tomorrow, any one team member could restore the entire project from their last clone.\n\nThis is why Git is so resilient.",
+        explanation: "Pro Git 1.1: Distributed Version Control Systems. Unlike old systems (SVN), Git doesn't rely on one central server for history.",
+        challenge: {
+            type: "quiz", question: "What does 'Distributed' mean in Git?",
+            options: [
+                "You have to pay for마다 user",
+                "The data is split into small pieces across the internet",
+                "Every user has a full copy of the entire repository project and its history",
+                "The code only works on certain computers"
+            ],
+            answer: 2, hint: "Complete backup on every laptop."
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 30, module: "Module 3: Collaboration", title: "The Sarah Conflict",
+        icon: "⚔️", xp: 200,
+        content: "Sarah changed the `menu.txt` on the remote. You changed `menu.txt` locally. \n\nWhen you run `git pull origin main`, Git will hit a **Conflict**. You must open the file, choose between Sarah's 'Espresso' or your 'Cold Brew', and commit the resolution using `git add` and `git commit`.",
+        explanation: "This is the most common real-world git problem. Don't panic. Resolving conflicts is where you become a real developer.",
+        challenge: {
+            type: "terminal",
+            prompt: "Resolve the conflict with Sarah's changes.",
+            steps: [
+                {
+                    instruction: "Pull from origin (this will cause a conflict)",
+                    expectedCommand: "git pull origin main",
+                    successMessage: "CONFLICT! menu.txt needs your attention. (Markers: <<<<<< <)",
+                    hint: "git pull origin main"
+                },
+                {
+                    instruction: "Stage the resolved file",
+                    expectedCommand: "git add menu.txt",
+                    successMessage: "Conflict markers removed. File staged.",
+                    hint: "git add menu.txt"
+                },
+                {
+                    instruction: "Commit the resolution",
+                    expectedCommand: "git commit -m \"Resolve conflict with Sarah's menu\"",
+                    successMessage: "History is whole again! You're a pro.",
+                    hint: "git commit -m \"Resolve conflict with Sarah's menu\""
+                }
+            ]
+        },
+        initialState: {
+            commits: [{ id: "c1", msg: "Initial menu", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: [{ name: "menu.txt", status: "modified" }],
+            remotes: { origin: { url: "https://github.com/coffee/shop.git", hasNewCommits: true } }
+        },
+        resultState: {
+            commits: [
+                { id: "c1", msg: "Initial menu", branch: "main" },
+                { id: "s1", msg: "Sarah: Add Espresso", branch: "main" },
+                { id: "r1", msg: "Resolve conflict", branch: "main" }
+            ],
+            branches: ["main"], head: "main",
+            files: [{ name: "menu.txt", status: "committed" }]
+        }
     },
 
-    // ─── MODULE 6: ADVANCED TOOLS ───
+    // ─── MODULE 4: MASTERY (Professional Grade) ───
     {
-        id: 31, module: "Advanced Tools", title: "Stashing Work",
-        icon: "📌", xp: 75,
-        content: "You're in the middle of coding a feature when your teammate says: \"There's a critical bug on main — can you fix it NOW?\"\n\nProblem: You have uncommitted changes that aren't ready to be committed. You can't switch branches with dirty files.\n\nSolution: `git stash` — temporarily shelves your uncommitted changes so you can switch to something else.\n\n`git stash` — Saves your current changes and reverts your working directory to the last commit\n\nAfter fixing the bug, you come back and restore your stashed work:\n\n`git stash pop` — Restores your stashed changes and removes the stash\n\nThe analogy: Think of it like putting a bookmark in your book. You set it aside, handle the interruption, and then pick up right where you left off.\n\nLet's stash your current work:\n\n`git stash`",
-        explanation: "Stashing is a developer's best friend during context switches. It's much cleaner than making a messy 'WIP' commit. Your stashed changes are stored safely and can be applied to any branch, not just the one you stashed from.",
-        challenge: {
-            type: "terminal", prompt: "Stash your current changes — type: git stash",
-            expectedCommand: "git stash",
-            successMessage: "Changes stashed! Your working directory is now clean. You can safely switch branches. When you're ready, use 'git stash pop' to restore your work.",
-            hint: "Type: git stash"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main", "feature"], head: "feature", files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "modified" }, { name: "utils.js", status: "staged" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }], branches: ["main", "feature"], head: "feature", files: [{ name: "index.html", status: "committed" }] }
-    },
-    {
-        id: 32, module: "Advanced Tools", title: "Stash Management",
-        icon: "📚", xp: 75,
-        content: "You can have MULTIPLE stashes! Git stores them in a stack (like a pile of bookmarks). Here are the commands to manage them:\n\n`git stash list` — View all saved stashes\nShows something like:\nstash@{0}: WIP on feature: abc1234 Add homepage\nstash@{1}: WIP on main: def5678 Initial commit\n\n`git stash pop` — Restore the most recent stash AND remove it from the list\n\n`git stash apply` — Restore the most recent stash but KEEP it in the list\nUseful when you want to apply the same stash to multiple branches.\n\n`git stash drop` — Delete the most recent stash without restoring it\n\n`git stash apply stash@{1}` — Apply a specific stash by its index\n\nTip: Don't let stashes pile up! Apply or drop them regularly. Old stashes are confusing and can cause conflicts.",
-        explanation: "The difference between 'pop' and 'apply' is important: pop removes the stash after restoring, while apply keeps it. Use apply when you want to try your stashed changes on a different branch without losing the stash.",
-        challenge: {
-            type: "quiz", question: "What is the difference between 'git stash pop' and 'git stash apply'?",
-            options: [
-                "There is no difference — they do the same thing",
-                "pop restores and removes the stash; apply restores but keeps the stash",
-                "pop only works on the main branch; apply works on any branch",
-                "apply is faster than pop"
-            ],
-            answer: 1, hint: "One of them removes the stash from the list after restoring, the other keeps a copy."
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }] }
-    },
-    {
-        id: 33, module: "Advanced Tools", title: "Understanding Rebasing",
-        icon: "📐", xp: 100,
-        content: "When you merge a branch, Git creates a \"merge commit\" — an extra commit that says \"these two branches were combined.\" Over time, this can make your history messy with lots of merge commits.\n\nRebasing is an alternative to merging that creates a CLEAN, LINEAR history.\n\n`git rebase main`\n\nInstead of creating a merge commit, rebase takes your branch's commits and REPLAYS them on top of the target branch. The result is a straight line of history, as if the branch never existed.\n\nMerge result: A → B → C ─┐\n                          └→ D → E (merge commit)\n\nRebase result: A → B → C → D → E (clean line)\n\n⚠️ THE GOLDEN RULE OF REBASING:\nNEVER rebase commits that have been pushed to a shared/public branch! Rebasing rewrites history, and if others have already pulled those commits, it creates chaos.\n\nRebase is safe to use on:\n• Your local feature branches (before pushing)\n• Private branches that nobody else is working on",
-        explanation: "Rebasing creates a cleaner, more readable history — but at the cost of rewriting commits. In practice, many teams use 'rebase before merge' — you rebase your feature branch onto main to get a clean history, then merge it via a Pull Request.",
-        challenge: {
-            type: "quiz", question: "When should you NEVER use git rebase?",
-            options: [
-                "On your local feature branch",
-                "Before pushing commits to a remote",
-                "On shared/public branches where others have already pulled the commits",
-                "On branches with only one commit"
-            ],
-            answer: 2, hint: "The golden rule: don't rewrite history that others are relying on."
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Add feature", branch: "feature" }], branches: ["main", "feature"], head: "feature", files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "committed" }] }
-    },
-    {
-        id: 34, module: "Advanced Tools", title: "Rebase in Practice",
-        icon: "🔧", xp: 100,
-        content: "Let's see rebasing in action! You're on a feature branch and want to replay your commits on top of the latest main branch.\n\nThe workflow:\n1. You're on your feature branch\n2. Main has new commits you don't have\n3. Instead of merging main into your branch (creating a merge commit), you rebase:\n\n`git rebase main`\n\nThis takes all the commits unique to your feature branch and replays them on top of main's latest commit. The result is a clean, linear history.\n\nAfter rebasing:\n• Your branch appears to have been created from the latest main commit\n• No merge commits clutter the history\n• The commit hashes will change (because commits are replayed)\n\nWe're currently on the 'feature' branch. Let's rebase onto main:\n\n`git rebase main`",
-        explanation: "Rebasing is a powerful tool for keeping a clean project history. Combined with Pull Requests and code review, it ensures that when changes land in main, the history tells a clear, linear story of how the project evolved.",
-        challenge: {
-            type: "terminal", prompt: "Rebase your feature branch onto main — type: git rebase main",
-            expectedCommand: "git rebase main",
-            successMessage: "Rebase complete! Your feature commits have been replayed on top of main. The history is now a clean, linear line.",
-            hint: "Type: git rebase main"
-        },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Update styles", branch: "main" }, { id: "c4", msg: "Add feature", branch: "feature" }], branches: ["main", "feature"], head: "feature", files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "committed" }] },
-        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Update styles", branch: "main" }, { id: "c4r", msg: "Add feature", branch: "main" }], branches: ["main", "feature"], head: "feature", files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "committed" }] }
-    },
-    {
-        id: "conflict-1",
-        module: "Collaboration Scenarios",
-        title: "The Great Conflict",
-        icon: "⚔️",
-        xp: 150,
-        content: "### Oh no! A Merge Conflict!\nWhile you were making coffee, Sarah pushed a change to the EXACT same line in `recipe.md`. Git doesn't know which one to keep.",
-        explanation: "Think of it like two people trying to write on the same line of a notebook. You need to pick which one is correct. This is the ultimate test for a beginner!",
-        teammateEvent: {
-            userName: "Sarah (Lead Dev)",
-            userIcon: "👩‍💻",
-            message: "Just pushed the new roast timings! Hope I didn't break anything... 😅"
-        },
+        id: 31, module: "Module 4: Mastery", title: "Rewriting History: Amend",
+        icon: "🖍️", xp: 100,
+        content: "You just committed, but realized you forgot a comma or made a typo. Don't make a new commit just for that!\n\nUse `git commit --amend` to 'edit' your last commit. It's like a time-travel eraser.",
+        explanation: "Pro Git 2.4: Undoing Things. Be careful — ONLY amend commits that haven't been pushed yet.",
         challenge: {
             type: "terminal",
-            prompt: "Resolve the conflict by merging 'main' into your branch.",
-            expectedCommand: "git merge main",
-            diffData: [
-                "<<<<<<< HEAD",
-                "Brew time: 5 mins",
-                "=======",
-                "Brew time: 7 mins",
-                ">>>>>>> main"
+            prompt: "Fix your last commit message.",
+            steps: [
+                {
+                    instruction: "Amend the last commit",
+                    expectedCommand: "git commit --amend -m \"Better message\"",
+                    successMessage: "Old commit replaced! No one will ever know you had a typo.",
+                    hint: "git commit --amend -m \"Better message\""
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Original typo message", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c2", msg: "Better message", branch: "main" }], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 32, module: "Module 4: Mastery", title: "Git Reset: The Safety Brake",
+        icon: "🛑", xp: 125,
+        content: "You've gone too far. Your code is a mess, and you want to throw it all away and go back to the last safe commit.\n\n`git reset --hard HEAD` is the 'Nuclear Option'. It wipes your working folder clean to match the last commit.",
+        explanation: "Pro Git 7.7: Reset Demystified. --hard is dangerous because it deletes uncommitted changes forever.",
+        challenge: {
+            type: "terminal",
+            prompt: "Emergency reset to last commit.",
+            steps: [
+                {
+                    instruction: "Hard reset",
+                    expectedCommand: "git reset --hard HEAD",
+                    successMessage: "Clean slate! The mess is gone.",
+                    hint: "git reset --hard HEAD"
+                }
             ]
         },
         initialState: {
-            head: "feature-roast",
-            conflict: true,
-            files: [
-                { name: "recipe.md", status: "conflict" }
-            ],
-            commits: [
-                { id: "a1b2c3d", msg: "Initial roast", branch: "main" },
-                { id: "e5f6g7h", msg: "My roast tweak", branch: "feature-roast" }
-            ]
+            commits: [{ id: "c1", msg: "Safe state", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: [{ name: "disaster.js", status: "modified" }]
         },
         resultState: {
-            head: "feature-roast",
-            files: [
-                { name: "recipe.md", status: "committed" }
-            ],
-            commits: [
-                { id: "a1b2c3d", msg: "Initial roast", branch: "main" },
-                { id: "e5f6g7h", msg: "My roast tweak", branch: "feature-roast" },
-                { id: "x9y8z7w", msg: "Merge branch 'main'", branch: "feature-roast" }
-            ]
+            commits: [{ id: "c1", msg: "Safe state", branch: "main" }],
+            branches: ["main"], head: "main",
+            files: []
         }
     },
     {
-        id: "ignore-1",
-        module: "Collaboration Scenarios",
-        title: "The .gitignore Lab",
-        icon: "🙈",
-        xp: 100,
-        content: "### Making Files Disappear\nSome files should NEVER be in Git (like `node_modules` or `.env` files with passwords). You tell Git to ignore them using a special file called `.gitignore`.",
-        explanation: "Adding a file to `.gitignore` is like giving Git a pair of 'invisible' glasses. It will simply ignore those files even if they are in your folder.",
+        id: 33, module: "Module 4: Mastery", title: "Interactive Rebase (Theory)",
+        icon: "🎾", xp: 150,
+        content: "Sometimes you have 10 messy commits like 'fix', 'fix2', 'bug'. You want to 'Squash' them into one clean commit named 'Implement Authentication'.\n\n`git rebase -i` (Interactive) lets you rewrite history like a movie editor. It's the ultimate 'clean code' tool.",
+        explanation: "Pro Git 7.6: Rewriting History. Squashing commits keeps the main branch history clean and professional.",
+        challenge: {
+            type: "quiz", question: "What is 'Squashing' in Git?",
+            options: [
+                "Deleting a branch",
+                "Combining multiple small commits into one large, meaningful commit",
+                "Making the file size smaller",
+                "Ignoring files"
+            ],
+            answer: 1, hint: "Think about pressing multiple things into one."
+        },
+        initialState: { commits: [{ id: "c1", msg: "fix", branch: "main" }, { id: "c2", msg: "fix2", branch: "main" }], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 34, module: "Module 4: Mastery", title: "The .gitignore Mastery",
+        icon: "🙈", xp: 100,
+        content: "Professional repos use `.gitignore` to keep out trash. Secrets, API keys, and temporary logs should never touch GitHub.\n\nSimply list the filenames in `.gitignore`, and Git will pretend they don't exist. You can verify this by running `git status` — ignored files will disappear from the list!",
+        explanation: "Ignoring files is critical for security. Never commit `.env` files!",
         challenge: {
             type: "terminal",
-            prompt: "Create a .gitignore file to ignore 'logs.txt'. Type: echo logs.txt > .gitignore",
-            expectedCommand: "echo logs.txt > .gitignore",
-            diffData: [
-                "--- /dev/null",
-                "+++ .gitignore",
-                "@@ -0,0 +1 @@",
-                "+logs.txt"
+            prompt: "Create a .gitignore to hide secrets.",
+            steps: [
+                {
+                    instruction: "Create the file",
+                    expectedCommand: "echo secrets.txt > .gitignore",
+                    successMessage: ".gitignore created! Git is now wearing blinders.",
+                    hint: "echo secrets.txt > .gitignore"
+                },
+                {
+                    instruction: "Check status to see the filter",
+                    expectedCommand: "git status",
+                    successMessage: "See? secrets.txt is no longer shown in the untracked list.",
+                    hint: "git status"
+                }
             ]
         },
         initialState: {
+            commits: [{ id: "c1", msg: "Base", branch: "main" }],
             head: "main",
-            files: [
-                { name: "index.html", status: "committed" },
-                { name: "logs.txt", status: "untracked" }
-            ],
-            commits: [{ id: "c1", msg: "Initial commit", branch: "main" }]
+            files: [{ name: "secrets.txt", status: "untracked" }]
         },
         resultState: {
+            commits: [{ id: "c1", msg: "Base", branch: "main" }],
             head: "main",
-            files: [
-                { name: "index.html", status: "committed" },
-                { name: ".gitignore", status: "staged" }
-            ],
-            commits: [{ id: "c1", msg: "Initial commit", branch: "main" }]
+            files: [{ name: ".gitignore", status: "staged" }]
         }
+    },
+    {
+        id: 35, module: "Module 4: Mastery", title: "Aliases: The Power User",
+        icon: "🏎️", xp: 75,
+        content: "Tired of typing `git status` 100 times a day? \n\nYou can create **Aliases**. `git config --global alias.st status` turns `git st` into a shortcut. \n\nProfessional developers have shorthand for everything.",
+        explanation: "Aliases save time and reduce typos. They are stored in your `.gitconfig` file.",
+        challenge: {
+            type: "quiz", question: "How do you set up an alias for 'checkout' to be 'co'?",
+            options: [
+                "git alias co checkout",
+                "git config --global alias.co checkout",
+                "git checkout alias co",
+                "git make shortcut co"
+            ],
+            answer: 1, hint: "Check the 'config' command."
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+    },
+    {
+        id: 36, module: "Module 4: Mastery", title: "The Graduation Roast",
+        icon: "🎓", xp: 500,
+        content: "You've done it! You know how to track files, branch out, collaborate on the cloud, and clean up your history like a pro. \n\nYour coffee shop is now a global empire. You are a Git Master!",
+        explanation: "Version control is the most important skill for a modern developer. Keep practicing, and don't be afraid to break things — because with Git, you can always fix them.",
+        challenge: {
+            type: "quiz", question: "Now that you've finished, what is your next step?",
+            options: [
+                "Delete Git and never use it again",
+                "Use Git for every project you work on and keep learning!",
+                "Only use Git when things break",
+                "Tell everyone Git is too hard"
+            ],
+            answer: 1, hint: "Continue the journey!"
+        },
+        initialState: { commits: [{ id: "c1", msg: "Final Graduation", branch: "main" }], branches: ["main"], head: "main", files: [] }
     }
 ];
 
 export const GIT_COMMANDS = [
-    "git init", "git status", "git add", "git add .", "git add --all",
-    "git commit -m", "git log", "git log --oneline", "git diff",
-    "git rm", "git rm --cached", "git restore", "git restore --staged",
-    "git reset", "git reset --hard", "git revert",
-    "git branch", "git checkout", "git checkout -b", "git merge",
-    "git clone", "git push", "git pull", "git fetch",
-    "git remote -v", "git stash", "git stash pop", "git stash apply",
-    "git stash list", "git stash drop", "git rebase",
-    "git config --global user.name", "git config --global user.email",
+    "git init", "git status", "git add", "git commit", "git log", "git diff", "git checkout",
+    "git branch", "git merge", "git remote", "git push", "git pull", "git fetch", "git clone",
+    "git reset", "git revert", "git stash", "git stash pop", "git cherry-pick", "git rebase",
+    "git commit --amend", "git config"
 ];
-

@@ -42,11 +42,14 @@ export default function GitMasterApp() {
     const [gitState, setGitState] = useState(null);
     const [selectedCommit, setSelectedCommit] = useState(null);
     const [notification, setNotification] = useState(null);
-    const [currentDiff, setCurrentDiff] = useState(null);
     const [vizCollapsed, setVizCollapsed] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
-    const [activeAction, setActiveAction] = useState(null); // Event bus for animations: 'init', 'status', 'add', 'commit'
+    const [activeAction, setActiveAction] = useState(null); // Event bus for animations
+    const [currentStepIdx, setCurrentStepIdx] = useState(0); // For multi-step challenges
+    const [currentDiff, setCurrentDiff] = useState(null);
+    const [showPractice, setShowPractice] = useState(false); // Two-phase flow: Theory -> Practice
     const contentRef = useRef(null);
+    const terminalRef = useRef(null);
 
     useEffect(() => {
         setIsMounted(true);
@@ -110,13 +113,20 @@ export default function GitMasterApp() {
     }, [answered, lesson, completeLesson]);
 
     const handleTerminalCommand = useCallback((cmd) => {
+        if (!cmd || typeof cmd !== "string") return { success: false, output: [] };
         if (!lesson?.challenge || lesson.challenge.type !== "terminal") {
-            return { success: false, output: [{ text: "This lesson uses a quiz challenge — answer above! The terminal is available for free experimentation.", type: "info" }] };
+            return { success: false, output: [{ text: "This lesson uses a quiz challenge — answer above!", type: "info" }] };
         }
+
         const challenge = lesson.challenge;
-        const expected = challenge.expectedCommand;
-        const alts = challenge.acceptAlso || [];
-        const pattern = challenge.matchPattern;
+        const steps = challenge.steps || [];
+        const isMultiStep = steps.length > 0;
+
+        // Target specifically the current step if it exists
+        const currentStep = isMultiStep ? steps[currentStepIdx] : challenge;
+        const expected = currentStep.expectedCommand;
+        const alts = currentStep.acceptAlso || [];
+        const pattern = currentStep.matchPattern;
         const normalized = cmd.trim().toLowerCase().replace(/\s+/g, " ");
 
         // BOARD ANIMATION TRIGGER
@@ -124,16 +134,24 @@ export default function GitMasterApp() {
         else if (normalized === "git status") setActiveAction("status");
         else if (normalized.startsWith("git add")) setActiveAction("add");
         else if (normalized.startsWith("git commit")) setActiveAction("commit");
+        else if (normalized.startsWith("git checkout") || normalized.startsWith("git switch")) setActiveAction("checkout");
+        else if (normalized.startsWith("git branch")) setActiveAction("branch");
+        else if (normalized.startsWith("git merge")) setActiveAction("merge");
+        else if (normalized.startsWith("git push")) setActiveAction("push");
+        else if (normalized.startsWith("git pull") || normalized.startsWith("git fetch")) setActiveAction("pull");
+        else if (normalized.startsWith("git clone")) setActiveAction("clone");
+        else if (normalized.startsWith("git stash")) setActiveAction("stash");
 
         // Clear action after duration
         setTimeout(() => setActiveAction(null), 2000);
 
         // Helper: apply resultState to animate visualization
         const applyResult = () => {
-            if (lesson.resultState) {
+            const stateToApply = currentStep.resultState || (currentStepIdx === steps.length - 1 ? lesson.resultState : null) || (isMultiStep ? null : lesson.resultState);
+            if (stateToApply) {
                 setTimeout(() => {
-                    setGitState(structuredClone(lesson.resultState));
-                    setSelectedCommit(null); // Clear selection if state changes
+                    setGitState(structuredClone(stateToApply));
+                    setSelectedCommit(null);
                 }, 300);
             }
         };
@@ -302,43 +320,44 @@ export default function GitMasterApp() {
             const realisticLines = getRealisticOutput(command);
             return [
                 ...realisticLines,
-                { text: challenge.successMessage, type: "success" },
+                { text: challenge.successMessage || "Challenge complete!", type: "success" },
                 { text: `+${lesson.xp} XP earned!`, type: "success" },
             ];
         };
 
-        // Exact match
-        if (normalized === expected || alts.includes(normalized)) {
-            applyResult();
-            // Pedagogical Delay: Let the board animations finish before the popup
-            const delay = (
-                normalized.startsWith("git status") ||
-                normalized.startsWith("git init") ||
-                normalized.startsWith("git commit") ||
-                normalized.startsWith("git add")
-            ) ? 2200 : 1000;
+        // Match Check
+        const isMatch = (normalized === expected || alts.includes(normalized)) ||
+            (pattern && normalized.startsWith(pattern.toLowerCase()) && normalized.length > pattern.length);
 
-            setTimeout(completeLesson, delay);
-            return {
-                success: true,
-                output: buildSuccessOutput(normalized),
-            };
-        }
+        if (isMatch) {
+            // Check if there are more steps
+            if (isMultiStep && currentStepIdx < steps.length - 1) {
+                // Move to next step
+                applyResult();
+                setCurrentStepIdx(prev => prev + 1);
+                return {
+                    success: true,
+                    output: [
+                        { text: currentStep.successMessage || "Good job!", type: "success" },
+                        { text: "Moving to next step...", type: "info" }
+                    ]
+                };
+            } else {
+                // Lesson Complete
+                applyResult();
+                const delay = (
+                    normalized.startsWith("git status") ||
+                    normalized.startsWith("git init") ||
+                    normalized.startsWith("git commit") ||
+                    normalized.startsWith("git add")
+                ) ? 2200 : 1000;
 
-        // Pattern match (flexible commands like git config, git commit -m, git clone)
-        if (pattern && normalized.startsWith(pattern.toLowerCase()) && normalized.length > pattern.length) {
-            applyResult();
-            const delay = (
-                normalized.startsWith("git commit") ||
-                normalized.startsWith("git add") ||
-                normalized.startsWith("git init")
-            ) ? 2200 : 1000;
-
-            setTimeout(completeLesson, delay);
-            return {
-                success: true,
-                output: buildSuccessOutput(normalized),
-            };
+                setTimeout(completeLesson, delay);
+                return {
+                    success: true,
+                    output: buildSuccessOutput(normalized),
+                };
+            }
         }
 
         // Smart error messages based on what they typed
@@ -381,6 +400,9 @@ export default function GitMasterApp() {
         setShowHint(false);
         setHintLevel(0);
         setSelectedCommit(null);
+        setCurrentStepIdx(0);
+        setCurrentDiff(null);
+        setShowPractice(false);
         setProgress(prev => ({ ...prev, currentLesson: id }));
     }, []);
 
@@ -579,7 +601,12 @@ export default function GitMasterApp() {
                         {lesson && (
                             <div>
                                 <div className="text-xs font-mono text-text-muted uppercase tracking-wider">{lesson.module} — Lesson {lesson.id}</div>
-                                <h2 className="font-heading font-bold text-text-primary">{lesson.title}</h2>
+                                <div className="flex items-center gap-2">
+                                    <h2 className="font-heading font-bold text-text-primary">{lesson.title}</h2>
+                                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-mono uppercase tracking-widest ${showPractice ? "bg-accent-green/10 text-accent-green" : "bg-accent-cyan/10 text-accent-cyan"}`}>
+                                        {showPractice ? "Practice Mode" : "Lecture Mode"}
+                                    </span>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -780,7 +807,7 @@ export default function GitMasterApp() {
 
                                         {/* Visual Diff Section */}
                                         <AnimatePresence>
-                                            {currentDiff && (
+                                            {currentDiff && showPractice && (
                                                 <motion.div
                                                     initial={{ opacity: 0, height: 0 }}
                                                     animate={{ opacity: 1, height: "auto" }}
@@ -791,9 +818,48 @@ export default function GitMasterApp() {
                                             )}
                                         </AnimatePresence>
 
+                                        {/* Start Practice Button */}
+                                        {!showPractice && lesson.challenge && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{
+                                                    opacity: 1,
+                                                    y: 0,
+                                                    boxShadow: ["0 0 20px rgba(0,229,255,0.2)", "0 0 35px rgba(0,229,255,0.4)", "0 0 20px rgba(0,229,255,0.2)"]
+                                                }}
+                                                transition={{
+                                                    y: { duration: 0.3 },
+                                                    boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                                                }}
+                                                className="mt-4 mb-4"
+                                            >
+                                                <button
+                                                    onClick={() => {
+                                                        setShowPractice(true);
+                                                        if (contentRef.current) {
+                                                            setTimeout(() => {
+                                                                contentRef.current.scrollTo({
+                                                                    top: contentRef.current.scrollHeight,
+                                                                    behavior: "smooth"
+                                                                });
+                                                            }, 100);
+                                                        }
+                                                    }}
+                                                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-accent-cyan to-accent-blue text-bg-primary font-bold text-sm shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group cursor-pointer"
+                                                >
+                                                    <span className="text-xl group-hover:rotate-12 transition-transform">🚀</span>
+                                                    Ready to Brew! (Start Practice)
+                                                </button>
+                                            </motion.div>
+                                        )}
+
                                         {/* Challenge */}
-                                        {lesson.challenge && (
-                                            <div className="mb-4">
+                                        {lesson.challenge && showPractice && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                className="mb-4"
+                                            >
                                                 <div className="text-[10px] font-mono uppercase tracking-widest text-accent-green mb-3 flex items-center gap-2">
                                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39ff14" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
                                                     Challenge
@@ -848,7 +914,10 @@ export default function GitMasterApp() {
                                                         <div className="flex items-center justify-between mb-1">
                                                             <p className="text-sm text-text-primary">{lesson.challenge.prompt}</p>
                                                             <button
-                                                                onClick={() => handleTerminalCommand(lesson.challenge.expectedCommand)}
+                                                                onClick={() => {
+                                                                    const cmdToRun = lesson.challenge.steps?.[currentStepIdx]?.expectedCommand || lesson.challenge.expectedCommand;
+                                                                    terminalRef.current?.runExternalCommand(cmdToRun);
+                                                                }}
                                                                 className="px-2 py-1 text-[9px] font-mono rounded bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan hover:bg-accent-cyan/20 transition-all cursor-pointer uppercase tracking-tight"
                                                                 title="Execute this command for me"
                                                             >
@@ -858,27 +927,29 @@ export default function GitMasterApp() {
                                                         <p className="text-[10px] font-mono text-text-muted">Type the command in the terminal below ↓</p>
                                                     </div>
                                                 )}
-                                            </div>
+                                            </motion.div>
                                         )}
 
                                         {/* Hint */}
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => { setShowHint(true); setHintLevel(prev => Math.min(prev + 1, 2)); }}
-                                                className="text-xs font-mono text-text-muted hover:text-accent-purple transition-colors cursor-pointer"
-                                            >
-                                                {showHint ? "Need more help?" : "💡 Show hint"}
-                                            </button>
-                                            {showHint && (
-                                                <motion.span
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    className="text-xs font-mono text-accent-purple"
+                                        {showPractice && lesson.challenge && (
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => { setShowHint(true); setHintLevel(prev => Math.min(prev + 1, 2)); }}
+                                                    className="text-xs font-mono text-text-muted hover:text-accent-purple transition-colors cursor-pointer"
                                                 >
-                                                    {lesson.challenge?.hint || "Try re-reading the lesson content above."}
-                                                </motion.span>
-                                            )}
-                                        </div>
+                                                    {showHint ? "Need more help?" : "💡 Show hint"}
+                                                </button>
+                                                {showHint && (
+                                                    <motion.span
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        className="text-xs font-mono text-accent-purple"
+                                                    >
+                                                        {lesson.challenge?.hint || "Try re-reading the lesson content above."}
+                                                    </motion.span>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {/* Navigation */}
                                         <div className="flex items-center justify-between mt-8 pt-4 border-t border-border">
@@ -912,13 +983,36 @@ export default function GitMasterApp() {
                         </div>
 
                         {/* Terminal */}
-                        <div className="h-56 min-h-[14rem] border-t border-border">
-                            <Terminal
-                                onCommand={handleTerminalCommand}
-                                lessonHint={lesson?.challenge?.hint}
-                                disabled={lesson?.challenge?.type === "quiz"}
-                            />
-                        </div>
+                        <AnimatePresence>
+                            {showPractice && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 50 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 50 }}
+                                    className="h-56 min-h-[14rem] border-t border-border"
+                                >
+                                    <Terminal
+                                        ref={terminalRef}
+                                        onCommand={handleTerminalCommand}
+                                        lessonHint={lesson?.challenge?.steps?.[currentStepIdx]?.hint || lesson?.challenge?.hint}
+                                        disabled={showSuccess || (lesson?.challenge?.type === "quiz" && answered)}
+                                        currentStep={currentStepIdx + 1}
+                                        totalSteps={lesson?.challenge?.steps?.length || 1}
+                                        stepInstruction={lesson?.challenge?.steps?.[currentStepIdx]?.instruction || lesson?.challenge?.prompt}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {!showPractice && lesson.challenge && (
+                            <div className="h-56 min-h-[14rem] border-t border-border flex flex-col items-center justify-center bg-bg-terminal/50 gap-3 grayscale opacity-40">
+                                <div className="w-12 h-12 rounded-full border-2 border-dashed border-text-muted/30 flex items-center justify-center text-2xl">🔒</div>
+                                <div className="text-center">
+                                    <div className="text-xs font-mono text-text-muted uppercase tracking-widest mb-1">Terminal Locked</div>
+                                    <div className="text-[10px] font-mono text-text-muted/60">Read the theory above to unlock the practice challenge</div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>

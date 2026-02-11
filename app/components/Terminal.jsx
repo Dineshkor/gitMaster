@@ -1,9 +1,9 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GIT_COMMANDS } from "../data/lessons";
 
-export default function Terminal({ onCommand, lessonHint, disabled }) {
+const Terminal = forwardRef(({ onCommand, lessonHint, disabled, currentStep, totalSteps, stepInstruction }, ref) => {
     const [history, setHistory] = useState([
         { type: "system", text: "GitMaster Terminal v1.0 — Type git commands here" },
         { type: "system", text: 'Type "help" for available commands or follow the lesson prompt.' },
@@ -21,6 +21,23 @@ export default function Terminal({ onCommand, lessonHint, disabled }) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [history]);
+
+    useImperativeHandle(ref, () => ({
+        runExternalCommand: (cmd) => {
+            if (!cmd) return;
+            addOutput([{ type: "input", text: cmd }]);
+            const result = onCommand?.(cmd);
+            if (result) {
+                addOutput(result.output.map(line => {
+                    const isObj = line !== null && typeof line === "object";
+                    return {
+                        type: isObj ? (line.type || (result.success ? "success" : "error")) : (result.success ? "success" : "error"),
+                        text: isObj ? (line.text ?? "") : String(line),
+                    };
+                }));
+            }
+        }
+    }));
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -84,10 +101,13 @@ export default function Terminal({ onCommand, lessonHint, disabled }) {
         } else {
             const result = onCommand?.(cmd);
             if (result) {
-                addOutput(result.output.map(line => ({
-                    type: line.type || (result.success ? "success" : "error"),
-                    text: line.text ?? line,
-                })));
+                addOutput(result.output.map(line => {
+                    const isObj = line !== null && typeof line === "object";
+                    return {
+                        type: isObj ? (line.type || (result.success ? "success" : "error")) : (result.success ? "success" : "error"),
+                        text: isObj ? (line.text ?? "") : String(line),
+                    };
+                }));
             }
         }
 
@@ -141,15 +161,40 @@ export default function Terminal({ onCommand, lessonHint, disabled }) {
     return (
         <div className="flex flex-col h-full bg-bg-terminal rounded-xl border border-border overflow-hidden">
             {/* Terminal Header */}
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-bg-secondary border-b border-border">
-                <div className="flex gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-accent-red/80" />
-                    <span className="w-3 h-3 rounded-full bg-accent-amber/80" />
-                    <span className="w-3 h-3 rounded-full bg-accent-green/80" />
+            <div className="flex items-center justify-between px-4 py-2 bg-bg-secondary border-b border-border">
+                <div className="flex items-center gap-3">
+                    <div className="flex gap-1.5 mr-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-accent-red/80" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-accent-amber/80" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-accent-green/80" />
+                    </div>
+                    {totalSteps > 1 && (
+                        <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md bg-accent-cyan/10 border border-accent-cyan/20 text-[10px] font-mono font-bold text-accent-cyan uppercase tracking-wider">
+                                Step {currentStep} / {totalSteps}
+                            </span>
+                            <div className="h-1 w-12 bg-white/5 rounded-full overflow-hidden">
+                                <motion.div
+                                    className="h-full bg-accent-cyan shadow-[0_0_8px_rgba(0,229,255,0.5)]"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <span className="ml-2 text-xs font-mono text-text-muted tracking-wider uppercase">
-                    GitMaster Terminal
-                </span>
+
+                {stepInstruction && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={stepInstruction}
+                        className="text-[10px] font-mono text-accent-green/80 truncate max-w-[200px]"
+                    >
+                        <span className="opacity-50 mr-1">👉</span> {stepInstruction}
+                    </motion.div>
+                )}
             </div>
 
             {/* Terminal Output */}
@@ -211,4 +256,6 @@ export default function Terminal({ onCommand, lessonHint, disabled }) {
             </form>
         </div>
     );
-}
+});
+
+export default Terminal;
