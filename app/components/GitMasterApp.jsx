@@ -45,6 +45,7 @@ export default function GitMasterApp() {
     const [currentDiff, setCurrentDiff] = useState(null);
     const [vizCollapsed, setVizCollapsed] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [activeAction, setActiveAction] = useState(null); // Event bus for animations: 'init', 'status', 'add', 'commit'
     const contentRef = useRef(null);
 
     useEffect(() => {
@@ -117,6 +118,15 @@ export default function GitMasterApp() {
         const alts = challenge.acceptAlso || [];
         const pattern = challenge.matchPattern;
         const normalized = cmd.trim().toLowerCase().replace(/\s+/g, " ");
+
+        // BOARD ANIMATION TRIGGER
+        if (normalized.startsWith("git init")) setActiveAction("init");
+        else if (normalized === "git status") setActiveAction("status");
+        else if (normalized.startsWith("git add")) setActiveAction("add");
+        else if (normalized.startsWith("git commit")) setActiveAction("commit");
+
+        // Clear action after duration
+        setTimeout(() => setActiveAction(null), 2000);
 
         // Helper: apply resultState to animate visualization
         const applyResult = () => {
@@ -300,7 +310,15 @@ export default function GitMasterApp() {
         // Exact match
         if (normalized === expected || alts.includes(normalized)) {
             applyResult();
-            setTimeout(completeLesson, 400);
+            // Pedagogical Delay: Let the board animations finish before the popup
+            const delay = (
+                normalized.startsWith("git status") ||
+                normalized.startsWith("git init") ||
+                normalized.startsWith("git commit") ||
+                normalized.startsWith("git add")
+            ) ? 2200 : 1000;
+
+            setTimeout(completeLesson, delay);
             return {
                 success: true,
                 output: buildSuccessOutput(normalized),
@@ -310,7 +328,13 @@ export default function GitMasterApp() {
         // Pattern match (flexible commands like git config, git commit -m, git clone)
         if (pattern && normalized.startsWith(pattern.toLowerCase()) && normalized.length > pattern.length) {
             applyResult();
-            setTimeout(completeLesson, 400);
+            const delay = (
+                normalized.startsWith("git commit") ||
+                normalized.startsWith("git add") ||
+                normalized.startsWith("git init")
+            ) ? 2200 : 1000;
+
+            setTimeout(completeLesson, delay);
             return {
                 success: true,
                 output: buildSuccessOutput(normalized),
@@ -617,14 +641,20 @@ export default function GitMasterApp() {
                                     conflict={gitState.conflict}
                                     onNodeClick={(c) => setSelectedCommit(c)}
                                     lessonId={lessonId}
+                                    activeAction={activeAction}
                                 />
                             )}
                             <div className="scanline absolute inset-0 pointer-events-none" />
                         </div>
 
                         {/* File States */}
-                        <div className="h-48 min-h-[12rem] border-t border-border overflow-auto p-4 bg-bg-secondary/30">
-                            {gitState && <FileStateView files={gitState.files || []} />}
+                        <div className="h-48 min-h-[12rem] border-t border-border overflow-auto p-4 bg-bg-secondary/30 relative">
+                            {gitState && (
+                                <FileStateView
+                                    files={gitState.files || []}
+                                    activeAction={activeAction}
+                                />
+                            )}
                         </div>
                     </div>
 

@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const BRANCH_COLORS = {
     main: "#00e5ff",
@@ -23,7 +23,7 @@ function getBranchColor(name) {
     return colors[hash % colors.length];
 }
 
-export default function CommitGraph({ commits = [], branches = [], head, detached, conflict, onNodeClick, lessonId = 1 }) {
+export default function CommitGraph({ commits = [], branches = [], head, detached, conflict, onNodeClick, lessonId = 1, activeAction }) {
     const isProMode = lessonId > 8;
     const canvasRef = useRef(null);
     const nodeRadius = 14;
@@ -119,24 +119,39 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                                 strokeWidth={isHead ? 3 : 1.5}
                                 style={{ filter: `drop-shadow(0 0 ${isHead ? 12 : 6}px ${color}50)` }}
                                 initial={{ scale: 0, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 20, delay: i * 0.05 }}
+                                animate={{
+                                    scale: activeAction === "commit" && i === commits.length - 1 ? [1, 1.4, 1] : 1,
+                                    opacity: 1,
+                                    filter: activeAction === "commit" ? [
+                                        `drop-shadow(0 0 ${isHead ? 12 : 6}px ${color}50)`,
+                                        `drop-shadow(0 0 20px ${color}ff)`,
+                                        `drop-shadow(0 0 ${isHead ? 12 : 6}px ${color}50)`
+                                    ] : `drop-shadow(0 0 ${isHead ? 12 : 6}px ${color}50)`
+                                }}
+                                transition={{
+                                    default: { type: "spring", stiffness: 300, damping: 20 },
+                                    scale: activeAction === "commit" ? { duration: 0.4, ease: "easeInOut" } : { type: "spring", stiffness: 300, damping: 20 },
+                                    filter: { duration: 0.6 },
+                                    delay: activeAction === "commit" ? (commits.length - 1 - i) * 0.1 : i * 0.05
+                                }}
                                 className="commit-node cursor-pointer"
                                 onClick={() => onNodeClick?.(commit)}
                             />
 
-                            {/* Shockwave for recent commits (the last one) */}
-                            {i === commits.length - 1 && (
-                                <motion.circle
-                                    cx={cx} cy={cy} r={nodeRadius}
-                                    fill="none"
-                                    stroke={color}
-                                    strokeWidth={2}
-                                    initial={{ scale: 1, opacity: 0.8 }}
-                                    animate={{ scale: 3, opacity: 0 }}
-                                    transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }}
-                                />
-                            )}
+                            {/* Git Commit Ripple Effect */}
+                            <AnimatePresence>
+                                {activeAction === "commit" && (
+                                    <motion.circle
+                                        cx={cx} cy={cy} r={nodeRadius}
+                                        fill="none"
+                                        stroke={color}
+                                        strokeWidth={2}
+                                        initial={{ scale: 1, opacity: 0.8 }}
+                                        animate={{ scale: 2.5, opacity: 0 }}
+                                        transition={{ duration: 0.8, delay: (commits.length - 1 - i) * 0.1 }}
+                                    />
+                                )}
+                            </AnimatePresence>
 
                             {/* Commit identifier (Hash or Proxy) */}
                             <motion.text

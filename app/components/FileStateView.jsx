@@ -11,7 +11,7 @@ const STATUS_CONFIG = {
     system: { color: "#475569", bg: "rgba(71,85,105,0.06)", label: "System", icon: "⚙" },
 };
 
-export default function FileStateView({ files = [] }) {
+export default function FileStateView({ files = [], activeAction }) {
     const areas = {
         working: files.filter(f => ["untracked", "modified"].includes(f.status)),
         staging: files.filter(f => f.status === "staged"),
@@ -88,7 +88,50 @@ export default function FileStateView({ files = [] }) {
                 )}
             </div>
 
-            <div className="flex gap-4 h-full">
+            <div className="flex gap-4 h-full relative">
+                {/* GIT INIT PULSE */}
+                <AnimatePresence>
+                    {activeAction === "init" && (
+                        <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 3, opacity: [0, 0.4, 0] }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className="absolute inset-0 z-0 bg-accent-cyan rounded-full filter blur-3xl pointer-events-none"
+                            style={{ margin: "auto", width: "100px", height: "100px" }}
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* GIT STATUS RADAR SCAN */}
+                <AnimatePresence>
+                    {activeAction === "status" && (
+                        <motion.div
+                            initial={{ left: "-10%" }}
+                            animate={{ left: "110%" }}
+                            transition={{ duration: 1.2, ease: "linear" }}
+                            className="absolute inset-y-0 w-24 z-20 pointer-events-none"
+                            style={{
+                                background: "linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.1), rgba(57, 255, 20, 0.4), rgba(57, 255, 20, 0.1), transparent)",
+                                boxShadow: "0 0 20px rgba(57, 255, 20, 0.2)"
+                            }}
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* GIT ADD STAGING SURGE */}
+                <AnimatePresence>
+                    {activeAction === "add" && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: [0, 0.4, 0] }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 1 }}
+                            className="absolute left-[33.3%] right-[33.3%] inset-y-0 z-0 pointer-events-none bg-accent-green/10 filter blur-3xl shadow-[0_0_100px_rgba(57,255,20,0.2)]"
+                        />
+                    )}
+                </AnimatePresence>
+
                 <AreaBox
                     title="Working"
                     desc="Your Local Desk"
