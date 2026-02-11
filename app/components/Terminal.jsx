@@ -27,8 +27,27 @@ export default function Terminal({ onCommand, lessonHint, disabled }) {
     }, []);
 
     const updateSuggestions = useCallback((val) => {
-        if (val.length < 2) { setSuggestions([]); return; }
-        const matches = GIT_COMMANDS.filter(c => c.startsWith(val)).slice(0, 5);
+        const input = val.toLowerCase();
+        if (input.length < 2) { setSuggestions([]); return; }
+
+        // Find commands that match the start of the input
+        let matches = GIT_COMMANDS.filter(c => c.toLowerCase().startsWith(input)).slice(0, 5);
+
+        // If it's a "git " command, try to suggest flags or subcommands
+        if (input.startsWith("git ")) {
+            const parts = input.split(" ");
+            if (parts.length > 1) {
+                const sub = parts[1];
+                // Suggest common flags if they match
+                const commonFlags = ["--oneline", "-m", "-b", "--all", "-d", "--cached", "--staged", "--version", "--help"];
+                const flagMatches = commonFlags
+                    .filter(f => f.startsWith(parts[parts.length - 1]))
+                    .map(f => parts.slice(0, -1).join(" ") + " " + f);
+
+                matches = [...matches, ...flagMatches].slice(0, 5);
+            }
+        }
+
         setSuggestions(matches);
         setSelectedSugg(0);
     }, []);

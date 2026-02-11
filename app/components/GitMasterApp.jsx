@@ -39,6 +39,7 @@ export default function GitMasterApp() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [showSuccess, setShowSuccess] = useState(false);
     const [gitState, setGitState] = useState(null);
+    const [selectedCommit, setSelectedCommit] = useState(null);
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -95,12 +96,15 @@ export default function GitMasterApp() {
         const expected = challenge.expectedCommand;
         const alts = challenge.acceptAlso || [];
         const pattern = challenge.matchPattern;
-        const normalized = cmd.trim().replace(/\s+/g, " ");
+        const normalized = cmd.trim().toLowerCase().replace(/\s+/g, " ");
 
         // Helper: apply resultState to animate visualization
         const applyResult = () => {
             if (lesson.resultState) {
-                setTimeout(() => setGitState(structuredClone(lesson.resultState)), 300);
+                setTimeout(() => {
+                    setGitState(structuredClone(lesson.resultState));
+                    setSelectedCommit(null); // Clear selection if state changes
+                }, 300);
             }
         };
 
@@ -277,7 +281,7 @@ export default function GitMasterApp() {
         }
 
         // Pattern match (flexible commands like git config, git commit -m, git clone)
-        if (pattern && normalized.startsWith(pattern) && normalized.length > pattern.length) {
+        if (pattern && normalized.startsWith(pattern.toLowerCase()) && normalized.length > pattern.length) {
             applyResult();
             setTimeout(completeLesson, 400);
             return {
@@ -325,6 +329,7 @@ export default function GitMasterApp() {
         setSelectedAnswer(null);
         setShowHint(false);
         setHintLevel(0);
+        setSelectedCommit(null);
         setProgress(prev => ({ ...prev, currentLesson: id }));
     }, []);
 
@@ -547,9 +552,9 @@ export default function GitMasterApp() {
                 </AnimatePresence>
 
                 {/* Content Area */}
-                <div className="flex-1 flex overflow-hidden">
+                <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
                     {/* LEFT — Visualization */}
-                    <div className="w-1/2 flex flex-col border-r border-border overflow-hidden">
+                    <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col border-b lg:border-b-0 lg:border-r border-border overflow-hidden">
                         {/* Commit Graph */}
                         <div className="flex-1 overflow-auto grid-bg relative">
                             {gitState && (
@@ -559,6 +564,7 @@ export default function GitMasterApp() {
                                     head={gitState.head}
                                     detached={gitState.detached}
                                     conflict={gitState.conflict}
+                                    onNodeClick={(c) => setSelectedCommit(c)}
                                 />
                             )}
                             <div className="scanline absolute inset-0 pointer-events-none" />
@@ -571,7 +577,74 @@ export default function GitMasterApp() {
                     </div>
 
                     {/* RIGHT — Lesson + Terminal */}
-                    <div className="w-1/2 flex flex-col overflow-hidden">
+                    <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col overflow-hidden relative">
+                        {/* Commit Detail Portal */}
+                        <AnimatePresence>
+                            {selectedCommit && (
+                                <motion.div
+                                    initial={{ x: "100%" }}
+                                    animate={{ x: 0 }}
+                                    exit={{ x: "100%" }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                    className="absolute inset-0 z-40 bg-bg-primary p-6 overflow-y-auto"
+                                >
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-6 bg-accent-cyan rounded-full" />
+                                            <h3 className="font-heading font-bold text-lg text-text-primary">Commit Details</h3>
+                                        </div>
+                                        <button
+                                            onClick={() => setSelectedCommit(null)}
+                                            className="p-2 rounded-lg hover:bg-bg-tertiary transition-colors text-text-muted hover:text-text-primary cursor-pointer"
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="p-4 rounded-xl bg-bg-secondary border border-border">
+                                            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-3">Commit Info</div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <div className="text-[10px] font-mono text-text-muted uppercase mb-1">Hash</div>
+                                                    <div className="text-xs font-mono text-accent-cyan">{selectedCommit.id}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-[10px] font-mono text-text-muted uppercase mb-1">Branch</div>
+                                                    <div className="text-xs font-mono text-accent-green">{selectedCommit.branch}</div>
+                                                </div>
+                                            </div>
+                                            <div className="mt-4">
+                                                <div className="text-[10px] font-mono text-text-muted uppercase mb-1">Message</div>
+                                                <div className="text-sm font-medium text-text-primary">{selectedCommit.msg}</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-4 rounded-xl bg-bg-secondary border border-border">
+                                            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-3">Snapshot Visualization</div>
+                                            <div className="text-xs text-text-secondary leading-relaxed mb-4">
+                                                This commit captured the project state precisely. In a real environment, this would include all tracked files.
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {gitState?.files?.filter(f => f.status === "committed").map(f => (
+                                                    <div key={f.name} className="px-2 py-1 bg-accent-cyan/10 border border-accent-cyan/20 rounded text-[10px] font-mono text-accent-cyan">
+                                                        {f.name}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => setSelectedCommit(null)}
+                                            className="w-full py-3 rounded-xl bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan font-mono text-xs hover:bg-accent-cyan/20 transition-all cursor-pointer"
+                                        >
+                                            Back to Lesson
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         {/* Lesson Content */}
                         <div className="flex-1 overflow-y-auto p-6">
                             {lesson ? (
@@ -661,7 +734,16 @@ export default function GitMasterApp() {
 
                                                 {lesson.challenge.type === "terminal" && (
                                                     <div className="p-3 rounded-lg bg-bg-tertiary border border-border">
-                                                        <p className="text-sm text-text-primary mb-1">{lesson.challenge.prompt}</p>
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <p className="text-sm text-text-primary">{lesson.challenge.prompt}</p>
+                                                            <button
+                                                                onClick={() => handleTerminalCommand(lesson.challenge.expectedCommand)}
+                                                                className="px-2 py-1 text-[9px] font-mono rounded bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan hover:bg-accent-cyan/20 transition-all cursor-pointer uppercase tracking-tight"
+                                                                title="Execute this command for me"
+                                                            >
+                                                                Run for me
+                                                            </button>
+                                                        </div>
                                                         <p className="text-[10px] font-mono text-text-muted">Type the command in the terminal below ↓</p>
                                                     </div>
                                                 )}

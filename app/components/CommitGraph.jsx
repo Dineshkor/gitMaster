@@ -23,7 +23,7 @@ function getBranchColor(name) {
     return colors[hash % colors.length];
 }
 
-export default function CommitGraph({ commits = [], branches = [], head, detached, conflict }) {
+export default function CommitGraph({ commits = [], branches = [], head, detached, conflict, onNodeClick }) {
     const canvasRef = useRef(null);
     const nodeRadius = 14;
     const nodeSpacingY = 70;
@@ -115,6 +115,7 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 20, delay: i * 0.1 }}
                                 className="commit-node cursor-pointer"
+                                onClick={() => onNodeClick?.(commit)}
                             />
 
                             {/* Commit hash */}
