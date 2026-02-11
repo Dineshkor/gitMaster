@@ -23,7 +23,8 @@ function getBranchColor(name) {
     return colors[hash % colors.length];
 }
 
-export default function CommitGraph({ commits = [], branches = [], head, detached, conflict, onNodeClick }) {
+export default function CommitGraph({ commits = [], branches = [], head, detached, conflict, onNodeClick, lessonId = 1 }) {
+    const isProMode = lessonId > 8;
     const canvasRef = useRef(null);
     const nodeRadius = 14;
     const nodeSpacingY = 70;
@@ -60,7 +61,7 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                                 strokeLinecap="round"
                                 initial={{ pathLength: 0, opacity: 0 }}
                                 animate={{ pathLength: 1, opacity: 0.6 }}
-                                transition={{ duration: 0.6, delay: i * 0.1 }}
+                                transition={{ duration: 0.8, ease: "easeInOut", delay: i * 0.05 }}
                             />
                         );
                     }
@@ -74,7 +75,7 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                             strokeLinecap="round"
                             initial={{ pathLength: 0, opacity: 0 }}
                             animate={{ pathLength: 1, opacity: 0.6 }}
-                            transition={{ duration: 0.4, delay: i * 0.1 }}
+                            transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.05 }}
                         />
                     );
                 })}
@@ -94,13 +95,19 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                             {/* Glow */}
                             {isHead && (
                                 <motion.circle
-                                    cx={cx} cy={cy} r={nodeRadius + 8}
+                                    cx={cx} cy={cy} r={nodeRadius}
                                     fill="none"
                                     stroke={color}
-                                    strokeWidth={1.5}
-                                    className="pulse-ring"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 0.4 }}
+                                    strokeWidth={2}
+                                    animate={{
+                                        scale: [1, 2],
+                                        opacity: [0.5, 0]
+                                    }}
+                                    transition={{
+                                        duration: 2,
+                                        repeat: Infinity,
+                                        ease: "easeOut"
+                                    }}
                                 />
                             )}
 
@@ -113,26 +120,53 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                                 style={{ filter: `drop-shadow(0 0 ${isHead ? 12 : 6}px ${color}50)` }}
                                 initial={{ scale: 0, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 20, delay: i * 0.1 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 20, delay: i * 0.05 }}
                                 className="commit-node cursor-pointer"
                                 onClick={() => onNodeClick?.(commit)}
                             />
 
-                            {/* Commit hash */}
+                            {/* Shockwave for recent commits (the last one) */}
+                            {i === commits.length - 1 && (
+                                <motion.circle
+                                    cx={cx} cy={cy} r={nodeRadius}
+                                    fill="none"
+                                    stroke={color}
+                                    strokeWidth={2}
+                                    initial={{ scale: 1, opacity: 0.8 }}
+                                    animate={{ scale: 3, opacity: 0 }}
+                                    transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }}
+                                />
+                            )}
+
+                            {/* Commit identifier (Hash or Proxy) */}
                             <motion.text
                                 x={cx} y={cy + 1}
                                 textAnchor="middle"
                                 dominantBaseline="central"
                                 fill="#0a0e17"
-                                fontSize={8}
+                                fontSize={isProMode ? 8 : 9}
                                 fontFamily="var(--font-mono)"
                                 fontWeight={700}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: i * 0.1 + 0.2 }}
                             >
-                                {(commit.id || "").slice(0, 4)}
+                                {isProMode
+                                    ? (commit.id || "").slice(0, 4)
+                                    : commit.shortId || `v${i + 1}`}
                             </motion.text>
+
+                            {/* Milestone Marker */}
+                            {commit.milestone && (
+                                <motion.g
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: "spring", delay: i * 0.1 + 0.5 }}
+                                >
+                                    <circle cx={cx + 10} cy={cy - 10} r={6} fill="#ffd166" stroke="#0a0e17" strokeWidth={1} />
+                                    <text x={cx + 10} y={cy - 9.5} textAnchor="middle" dominantBaseline="central" fontSize={8} fill="#0a0e17">★</text>
+                                </motion.g>
+                            )}
 
                             {/* Commit message */}
                             <motion.text
@@ -148,6 +182,36 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                             >
                                 {commit.msg}
                             </motion.text>
+
+                            {/* Pedagogical Marker (Bubble) */}
+                            {commit.marker && (
+                                <motion.g
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.1 + 0.5 }}
+                                >
+                                    <rect
+                                        x={cx + nodeRadius + 12 + (commit.msg.length * 7)}
+                                        y={cy - 8}
+                                        width={commit.marker.length * 6 + 12}
+                                        height={16}
+                                        rx={8}
+                                        fill="#a855f715"
+                                        stroke="#a855f740"
+                                    />
+                                    <text
+                                        x={cx + nodeRadius + 12 + (commit.msg.length * 7) + 6}
+                                        y={cy + 1}
+                                        dominantBaseline="central"
+                                        fill="#a855f7"
+                                        fontSize={8}
+                                        fontFamily="var(--font-mono)"
+                                        fontWeight={600}
+                                    >
+                                        {commit.marker}
+                                    </text>
+                                </motion.g>
+                            )}
 
                             {/* HEAD pointer */}
                             {isHead && (

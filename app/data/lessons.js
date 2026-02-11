@@ -32,7 +32,13 @@ export const LESSONS = [
             ],
             answer: 2, hint: "Think about the shipping analogy: desk → box → post office."
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "modified" }, { name: "style.css", status: "staged" }, { name: "app.js", status: "committed" }] }
+        initialState: {
+            commits: [
+                { id: "c1", msg: "Initial commit", branch: "main", marker: "The Big Bang", milestone: true, storyContext: "The moment the coffee shop dream became a project! This commit is the root of the entire tree." }
+            ],
+            branches: ["main"], head: "main",
+            files: [{ name: "index.html", status: "modified" }, { name: "style.css", status: "staged" }, { name: "app.js", status: "committed" }]
+        }
     },
     {
         id: 3, module: "Core Concepts & Setup", title: "The Hidden .git Folder",
@@ -94,6 +100,12 @@ export const LESSONS = [
             type: "terminal", prompt: "Initialize a new Git repository — type: git init",
             expectedCommand: "git init",
             successMessage: "Repository initialized! Notice the .git folder has been created. Git is now tracking this project.",
+            diffData: [
+                "--- /dev/null",
+                "+++ .git/",
+                "@@ -0,0 +1 @@",
+                "+(Initial Git repository created)"
+            ],
             hint: "Type exactly: git init"
         },
         initialState: { commits: [], branches: [], head: null, files: [] },
@@ -142,7 +154,13 @@ export const LESSONS = [
             hint: "Type: git commit -m \"Initial commit\" (you can use any message you like)"
         },
         initialState: { commits: [], branches: ["main"], head: "main", files: [{ name: "index.html", status: "staged" }] },
-        resultState: { commits: [{ id: "a1b2c3", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }] }
+        resultState: {
+            commits: [
+                { id: "a1b2c3", msg: "Initial commit", branch: "main", marker: "First Roast", milestone: true, storyContext: "You've officially sealed the first version of your coffee recipe! This is a solid point you can always return to if the recipe goes wrong." }
+            ],
+            branches: ["main"], head: "main",
+            files: [{ name: "index.html", status: "committed" }]
+        }
     },
     {
         id: 10, module: "The Local Workflow", title: "Staging Strategies",
@@ -170,6 +188,12 @@ export const LESSONS = [
             type: "terminal", prompt: "Remove the old.txt file from the project — type: git rm old.txt",
             expectedCommand: "git rm old.txt",
             successMessage: "File removed and deletion staged! The file is gone from your working directory and Git knows about it.",
+            diffData: [
+                "--- a/old.txt",
+                "+++ /dev/null",
+                "@@ -1 +0,0 @@",
+                "-This file is no longer needed."
+            ],
             hint: "Type: git rm old.txt"
         },
         initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add project files", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "old.txt", status: "committed" }] },
@@ -184,6 +208,12 @@ export const LESSONS = [
             type: "terminal", prompt: "Stop tracking secrets.txt (keep the file) — type: git rm --cached secrets.txt",
             expectedCommand: "git rm --cached secrets.txt",
             successMessage: "File removed from tracking! Git will now ignore secrets.txt, but the file still exists on your computer.",
+            diffData: [
+                "--- a/secrets.txt",
+                "+++ /dev/null",
+                "@@ -1 +0,0 @@",
+                "-API_KEY=5f3e9c..."
+            ],
             hint: "Type: git rm --cached secrets.txt"
         },
         initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "index.html", status: "committed" }, { name: "secrets.txt", status: "committed" }] },
@@ -539,6 +569,90 @@ export const LESSONS = [
         initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Update styles", branch: "main" }, { id: "c4", msg: "Add feature", branch: "feature" }], branches: ["main", "feature"], head: "feature", files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "committed" }] },
         resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add homepage", branch: "main" }, { id: "c3", msg: "Update styles", branch: "main" }, { id: "c4r", msg: "Add feature", branch: "main" }], branches: ["main", "feature"], head: "feature", files: [{ name: "index.html", status: "committed" }, { name: "feature.js", status: "committed" }] }
     },
+    {
+        id: "conflict-1",
+        module: "Collaboration Scenarios",
+        title: "The Great Conflict",
+        icon: "⚔️",
+        xp: 150,
+        content: "### Oh no! A Merge Conflict!\nWhile you were making coffee, Sarah pushed a change to the EXACT same line in `recipe.md`. Git doesn't know which one to keep.",
+        explanation: "Think of it like two people trying to write on the same line of a notebook. You need to pick which one is correct. This is the ultimate test for a beginner!",
+        teammateEvent: {
+            userName: "Sarah (Lead Dev)",
+            userIcon: "👩‍💻",
+            message: "Just pushed the new roast timings! Hope I didn't break anything... 😅"
+        },
+        challenge: {
+            type: "terminal",
+            prompt: "Resolve the conflict by merging 'main' into your branch.",
+            expectedCommand: "git merge main",
+            diffData: [
+                "<<<<<<< HEAD",
+                "Brew time: 5 mins",
+                "=======",
+                "Brew time: 7 mins",
+                ">>>>>>> main"
+            ]
+        },
+        initialState: {
+            head: "feature-roast",
+            conflict: true,
+            files: [
+                { name: "recipe.md", status: "conflict" }
+            ],
+            commits: [
+                { id: "a1b2c3d", msg: "Initial roast", branch: "main" },
+                { id: "e5f6g7h", msg: "My roast tweak", branch: "feature-roast" }
+            ]
+        },
+        resultState: {
+            head: "feature-roast",
+            files: [
+                { name: "recipe.md", status: "committed" }
+            ],
+            commits: [
+                { id: "a1b2c3d", msg: "Initial roast", branch: "main" },
+                { id: "e5f6g7h", msg: "My roast tweak", branch: "feature-roast" },
+                { id: "x9y8z7w", msg: "Merge branch 'main'", branch: "feature-roast" }
+            ]
+        }
+    },
+    {
+        id: "ignore-1",
+        module: "Collaboration Scenarios",
+        title: "The .gitignore Lab",
+        icon: "🙈",
+        xp: 100,
+        content: "### Making Files Disappear\nSome files should NEVER be in Git (like `node_modules` or `.env` files with passwords). You tell Git to ignore them using a special file called `.gitignore`.",
+        explanation: "Adding a file to `.gitignore` is like giving Git a pair of 'invisible' glasses. It will simply ignore those files even if they are in your folder.",
+        challenge: {
+            type: "terminal",
+            prompt: "Create a .gitignore file to ignore 'logs.txt'. Type: echo logs.txt > .gitignore",
+            expectedCommand: "echo logs.txt > .gitignore",
+            diffData: [
+                "--- /dev/null",
+                "+++ .gitignore",
+                "@@ -0,0 +1 @@",
+                "+logs.txt"
+            ]
+        },
+        initialState: {
+            head: "main",
+            files: [
+                { name: "index.html", status: "committed" },
+                { name: "logs.txt", status: "untracked" }
+            ],
+            commits: [{ id: "c1", msg: "Initial commit", branch: "main" }]
+        },
+        resultState: {
+            head: "main",
+            files: [
+                { name: "index.html", status: "committed" },
+                { name: ".gitignore", status: "staged" }
+            ],
+            commits: [{ id: "c1", msg: "Initial commit", branch: "main" }]
+        }
+    }
 ];
 
 export const GIT_COMMANDS = [

@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LESSONS } from "../data/lessons";
 import Terminal from "./Terminal";
 import CommitGraph from "./CommitGraph";
 import FileStateView from "./FileStateView";
+import DiffView from "./DiffView";
 
 const CHEAT_SHEET = [
     { cat: "Setup", cmds: ["git init", "git clone <url>", "git config --global user.name \"Name\""] },
@@ -40,7 +41,11 @@ export default function GitMasterApp() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [gitState, setGitState] = useState(null);
     const [selectedCommit, setSelectedCommit] = useState(null);
+    const [notification, setNotification] = useState(null);
+    const [currentDiff, setCurrentDiff] = useState(null);
+    const [vizCollapsed, setVizCollapsed] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const contentRef = useRef(null);
 
     useEffect(() => {
         setIsMounted(true);
@@ -53,9 +58,24 @@ export default function GitMasterApp() {
 
     useEffect(() => {
         if (lesson?.initialState) setGitState(structuredClone(lesson.initialState));
+        setCurrentDiff(null);
+        setNotification(null);
+
+        // Trigger simulated teammate activity if lesson has metadata
+        if (lesson?.teammateEvent) {
+            setTimeout(() => {
+                setNotification(lesson.teammateEvent);
+            }, 2000);
+        }
     }, [lesson]);
 
     useEffect(() => { saveProgress(progress); }, [progress]);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            contentRef.current.scrollTop = 0;
+        }
+    }, [lessonId]);
 
     const completeLesson = useCallback(() => {
         setShowSuccess(true);
@@ -158,6 +178,13 @@ export default function GitMasterApp() {
                     });
                 } else {
                     lines.push({ text: `add '${file}'`, type: "output" });
+                }
+            } else if (command === "git diff") {
+                if (lesson?.challenge?.diffData) {
+                    setCurrentDiff(lesson.challenge.diffData);
+                    lines.push({ text: "Showing visual diff in the lesson panel...", type: "info" });
+                } else {
+                    lines.push({ text: "No changes to show.", type: "output" });
                 }
             } else if (command === "git status") {
                 lines.push({ text: `On branch ${state.head || "main"}`, type: "output" });
@@ -368,22 +395,38 @@ export default function GitMasterApp() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+                        className="fixed inset-0 z-[60] flex items-center justify-center bg-bg-primary/80 backdrop-blur-md"
                     >
                         <motion.div
-                            initial={{ scale: 0.3, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 1.5, opacity: 0 }}
-                            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                            className="text-center"
+                            initial={{ scale: 0.8, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="bg-bg-card p-10 rounded-3xl border border-accent-green/30 text-center shadow-2xl relative overflow-hidden"
                         >
-                            <div className="text-6xl mb-4">🎉</div>
-                            <div className="text-2xl font-heading font-bold text-accent-green text-glow-green">
-                                Lesson Complete!
-                            </div>
-                            <div className="text-accent-cyan font-mono text-sm mt-2">
-                                +{lesson?.xp || 50} XP
-                            </div>
+                            {/* Particle Animation Simulated with motion.divs */}
+                            {[...Array(8)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, scale: 0 }}
+                                    animate={{
+                                        opacity: [0, 1, 0],
+                                        scale: [0, 1.5, 0],
+                                        x: Math.cos(i * 45) * 100,
+                                        y: Math.sin(i * 45) * 100
+                                    }}
+                                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+                                    className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-accent-green opacity-40"
+                                />
+                            ))}
+
+                            <div className="text-6xl mb-6">🎉</div>
+                            <h1 className="text-3xl font-heading font-black text-text-primary mb-2 tracking-tight">Lesson Complete!</h1>
+                            <p className="text-accent-green font-mono text-sm mb-8">+{lesson?.xp || 0} XP EARNED</p>
+                            <button
+                                onClick={() => setShowSuccess(false)}
+                                className="px-10 py-3 bg-accent-green text-bg-primary font-heading font-bold rounded-xl hover:scale-105 transition-transform cursor-pointer"
+                            >
+                                Keep Learning
+                            </button>
                         </motion.div>
                     </motion.div>
                 )}
@@ -554,7 +597,15 @@ export default function GitMasterApp() {
                 {/* Content Area */}
                 <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
                     {/* LEFT — Visualization */}
-                    <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col border-b lg:border-b-0 lg:border-r border-border overflow-hidden">
+                    <div className={`${vizCollapsed ? 'h-12' : 'h-1/2'} lg:h-full w-full lg:w-1/2 flex flex-col border-b lg:border-b-0 lg:border-r border-border overflow-hidden transition-all duration-300 relative grid-bg`}>
+                        <div className="absolute inset-0 scanline pointer-events-none opacity-50" />
+                        {/* Mobile Collapse Toggle */}
+                        <button
+                            onClick={() => setVizCollapsed(!vizCollapsed)}
+                            className="lg:hidden absolute top-2 right-2 z-30 p-2 bg-bg-tertiary/80 backdrop-blur rounded-lg border border-border text-text-muted hover:text-text-primary"
+                        >
+                            {vizCollapsed ? "Expand Viz ↑" : "Collapse Viz ↓"}
+                        </button>
                         {/* Commit Graph */}
                         <div className="flex-1 overflow-auto grid-bg relative">
                             {gitState && (
@@ -565,6 +616,7 @@ export default function GitMasterApp() {
                                     detached={gitState.detached}
                                     conflict={gitState.conflict}
                                     onNodeClick={(c) => setSelectedCommit(c)}
+                                    lessonId={lessonId}
                                 />
                             )}
                             <div className="scanline absolute inset-0 pointer-events-none" />
@@ -577,7 +629,7 @@ export default function GitMasterApp() {
                     </div>
 
                     {/* RIGHT — Lesson + Terminal */}
-                    <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col overflow-hidden relative">
+                    <div className={`flex-1 flex flex-col overflow-hidden relative ${vizCollapsed ? 'h-full' : 'h-1/2 lg:h-full'} w-full lg:w-1/2`}>
                         {/* Commit Detail Portal */}
                         <AnimatePresence>
                             {selectedCommit && (
@@ -602,8 +654,24 @@ export default function GitMasterApp() {
                                     </div>
 
                                     <div className="space-y-6">
+                                        {/* STORY CONTEXT (PEDAGOGY) */}
+                                        {selectedCommit.storyContext && (
+                                            <div className="p-5 rounded-2xl bg-accent-purple/5 border border-accent-purple/20 relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
+                                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5M12 16h.01" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                </div>
+                                                <div className="text-[10px] font-mono uppercase tracking-widest text-accent-purple mb-2">The Project Story</div>
+                                                <div className="text-sm italic text-text-primary leading-relaxed relative z-10">
+                                                    "{selectedCommit.storyContext}"
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="p-4 rounded-xl bg-bg-secondary border border-border">
-                                            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-3">Commit Info</div>
+                                            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-3 flex items-center justify-between">
+                                                <span>Commit Info</span>
+                                                {selectedCommit.marker && <span className="px-2 py-0.5 rounded-full bg-accent-purple/10 text-accent-purple text-[8px]">{selectedCommit.marker}</span>}
+                                            </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <div className="text-[10px] font-mono text-text-muted uppercase mb-1">Hash</div>
@@ -646,7 +714,7 @@ export default function GitMasterApp() {
                         </AnimatePresence>
 
                         {/* Lesson Content */}
-                        <div className="flex-1 overflow-y-auto p-6">
+                        <div ref={contentRef} className="flex-1 overflow-y-auto p-6">
                             {lesson ? (
                                 <AnimatePresence mode="wait">
                                     <motion.div
@@ -679,6 +747,19 @@ export default function GitMasterApp() {
                                             </div>
                                             <p className="text-xs text-text-secondary leading-relaxed">{lesson.explanation}</p>
                                         </div>
+
+                                        {/* Visual Diff Section */}
+                                        <AnimatePresence>
+                                            {currentDiff && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: "auto" }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                >
+                                                    <DiffView diff={currentDiff} />
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
 
                                         {/* Challenge */}
                                         {lesson.challenge && (
@@ -811,6 +892,34 @@ export default function GitMasterApp() {
                     </div>
                 </div>
             </main>
+            {/* TEAMMATE NOTIFICATION */}
+            <AnimatePresence>
+                {notification && (
+                    <motion.div
+                        initial={{ x: 400, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: 400, opacity: 0 }}
+                        className="fixed top-20 right-6 z-50 w-72 p-4 bg-bg-card border border-accent-purple/30 rounded-xl shadow-2xl glow-magenta"
+                    >
+                        <div className="flex gap-3">
+                            <div className="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center text-lg">
+                                {notification.userIcon || "🧑‍💻"}
+                            </div>
+                            <div>
+                                <div className="text-[10px] font-mono text-accent-purple uppercase tracking-widest mb-1">Teammate Activity</div>
+                                <div className="text-sm font-medium text-text-primary mb-1">{notification.userName}</div>
+                                <div className="text-xs text-text-secondary leading-tight">{notification.message}</div>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setNotification(null)}
+                            className="absolute top-2 right-2 p-1 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
