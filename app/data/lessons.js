@@ -15,6 +15,19 @@ export const LESSONS = [
             ],
             answer: 2, hint: "Think about the recipe book analogy — do we overwrite or record?"
         },
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Let's verify Git is installed on your machine!",
+            steps: [
+                {
+                    instruction: "Check your Git version",
+                    expectedCommand: "git --version",
+                    acceptAlso: ["git -v"],
+                    successMessage: "Git is installed! You\'re ready to start your version control journey.",
+                    hint: "git --version"
+                }
+            ]
+        },
         initialState: { commits: [], branches: ["main"], head: "main", files: [] }
     },
     {
@@ -31,6 +44,18 @@ export const LESSONS = [
                 "Only for projects smaller than 1GB"
             ],
             answer: 1, hint: "Remember the engine/garage analogy."
+        },
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Prove Git works without any internet! Initialize a local repo.",
+            steps: [
+                {
+                    instruction: "Initialize a new Git repository right here",
+                    expectedCommand: "git init",
+                    successMessage: "See? No internet needed. Git works 100% locally!",
+                    hint: "git init"
+                }
+            ]
         },
         initialState: { commits: [], branches: ["main"], head: "main", files: [] }
     },
@@ -49,11 +74,38 @@ export const LESSONS = [
             ],
             answer: 2, hint: "It's like a shipping box you're filling up."
         },
+        bonusPractice: {
+            type: "terminal",
+            prompt: "See the three stages in action! Check and stage your files.",
+            steps: [
+                {
+                    instruction: "Check which files are in each stage",
+                    expectedCommand: "git status",
+                    successMessage: "You can see modified, staged, and untracked files — the three stages!",
+                    hint: "git status"
+                },
+                {
+                    instruction: "Move roast_v1.txt from your Desk to the Shipping Box (stage it)",
+                    expectedCommand: "git add roast_v1.txt",
+                    successMessage: "Staged! The file moved from Working Directory to Staging Area.",
+                    hint: "git add roast_v1.txt"
+                }
+            ]
+        },
         initialState: {
             commits: [],
             branches: ["main"], head: "main",
             files: [
                 { name: "roast_v1.txt", status: "modified" },
+                { name: "beans.md", status: "staged" },
+                { name: "shop_logo.png", status: "untracked" }
+            ]
+        },
+        resultState: {
+            commits: [],
+            branches: ["main"], head: "main",
+            files: [
+                { name: "roast_v1.txt", status: "staged" },
                 { name: "beans.md", status: "staged" },
                 { name: "shop_logo.png", status: "untracked" }
             ]
@@ -128,6 +180,11 @@ export const LESSONS = [
             ]
         },
         initialState: {
+            commits: [],
+            branches: ["main"], head: "main",
+            files: [{ name: "recipe.md", status: "untracked" }]
+        },
+        resultState: {
             commits: [],
             branches: ["main"], head: "main",
             files: [{ name: "recipe.md", status: "untracked" }]
@@ -219,7 +276,21 @@ export const LESSONS = [
             ],
             answer: 1, hint: "Look for the one that provides context without being a novel."
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Write a proper commit message following the golden rules!",
+            steps: [
+                {
+                    instruction: "Commit with a descriptive message in imperative mood",
+                    expectedCommand: "git commit -m \"Add coffee bean counter validation\"",
+                    matchPattern: "git commit -m",
+                    successMessage: "Great commit message! Descriptive and imperative — your future self will thank you.",
+                    hint: "git commit -m \"Add coffee bean counter validation\""
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }], branches: ["main"], head: "main", files: [{ name: "counter.js", status: "staged" }] },
+        resultState: { commits: [{ id: "c1", msg: "Initial commit", branch: "main" }, { id: "c2", msg: "Add validation", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
         id: 10, module: "Module 1: Fundamentals", title: "Summary: The Local Heartbeat",
@@ -282,7 +353,26 @@ export const LESSONS = [
             ],
             answer: 1, hint: "Side kitchens and experimental menus — why isolate them?"
         },
-        initialState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Create your first branch and see it in the list!",
+            steps: [
+                {
+                    instruction: "List all existing branches",
+                    expectedCommand: "git branch",
+                    successMessage: "You can see the asterisk (*) marks your current branch!",
+                    hint: "git branch"
+                },
+                {
+                    instruction: "Create a new branch called 'feature'",
+                    expectedCommand: "git branch feature",
+                    successMessage: "New branch created! Notice you\'re still on main — creating doesn\'t switch.",
+                    hint: "git branch feature"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Initial roast", branch: "main" }], branches: ["main", "feature"], head: "main", files: [] }
     },
     {
         id: 12, module: "Module 2: Branching", title: "Creating Your Side Kitchen",
@@ -405,7 +495,33 @@ export const LESSONS = [
             ],
             answer: 2, hint: "Git is a tool, but you are the judge."
         },
-        initialState: { commits: [{ id: "c1", msg: "Split commit", branch: "main" }], branches: ["main", "branch"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Trigger a merge to see how conflicts start!",
+            steps: [
+                {
+                    instruction: "Attempt to merge the branch with conflicting changes",
+                    expectedCommand: "git merge branch",
+                    successMessage: "Conflict triggered! In a real scenario, you\'d see <<<<<<< markers in the file. Edit, choose, and commit!",
+                    hint: "git merge branch"
+                },
+                {
+                    instruction: "After resolving, stage the fixed file",
+                    expectedCommand: "git add menu.txt",
+                    successMessage: "Staged! Now commit to seal the resolved conflict.",
+                    hint: "git add menu.txt"
+                },
+                {
+                    instruction: "Commit the merge resolution",
+                    expectedCommand: "git commit -m \"Resolve merge conflict\"",
+                    matchPattern: "git commit -m",
+                    successMessage: "Conflict resolved like a pro! You\'re the judge, and you judged well.",
+                    hint: "git commit -m \"Resolve merge conflict\""
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Split commit", branch: "main" }], branches: ["main", "branch"], head: "main", files: [{ name: "menu.txt", status: "modified" }] },
+        resultState: { commits: [{ id: "c1", msg: "Split commit", branch: "main" }, { id: "c2", msg: "Resolve merge conflict", branch: "main" }], branches: ["main", "branch"], head: "main", files: [] }
     },
     {
         id: 17, module: "Module 2: Branching", title: "Cleaning Up: Deleting Branches",
@@ -442,7 +558,20 @@ export const LESSONS = [
             ],
             answer: 2, hint: "Think about how the lines look in the graph — a web or a straight line?"
         },
-        initialState: { commits: [{ id: "c1", msg: "Split", branch: "main" }], branches: ["main", "feature"], head: "feature", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Rebase your feature branch onto main for a clean history!",
+            steps: [
+                {
+                    instruction: "Rebase your current branch onto main",
+                    expectedCommand: "git rebase main",
+                    successMessage: "Rebased! Your commits now sit on top of main — a clean, linear history.",
+                    hint: "git rebase main"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Split", branch: "main" }], branches: ["main", "feature"], head: "feature", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Split", branch: "main" }, { id: "c2", msg: "Feature work", branch: "feature" }], branches: ["main", "feature"], head: "feature", files: [] }
     },
     {
         id: 19, module: "Module 2: Branching", title: "Cherry Picking",
@@ -521,7 +650,21 @@ export const LESSONS = [
             options: ["master", "main", "origin", "cloud"],
             answer: 2, hint: "It starts with O and means 'beginning/source'."
         },
-        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Check if your repository has any remote connections!",
+            steps: [
+                {
+                    instruction: "List all remote repositories",
+                    expectedCommand: "git remote -v",
+                    acceptAlso: ["git remote"],
+                    successMessage: "This shows all remote connections. A fresh repo has none — you'll add one soon!",
+                    hint: "git remote -v"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
         id: 22, module: "Module 3: Collaboration", title: "Adding a Remote",
@@ -614,7 +757,21 @@ export const LESSONS = [
             options: ["git fetch", "git pull", "git merge", "git remote"],
             answer: 1, hint: "Fetch looks, Pull takes."
         },
-        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Use git fetch to safely check what's new on the remote!",
+            steps: [
+                {
+                    instruction: "Fetch the latest changes from origin without merging",
+                    expectedCommand: "git fetch",
+                    acceptAlso: ["git fetch origin"],
+                    successMessage: "Fetched! You can now see what's new without touching your local code. Safe and sound.",
+                    hint: "git fetch"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
         id: 26, module: "Module 3: Collaboration", title: "Pulling the Latest",
@@ -662,7 +819,20 @@ export const LESSONS = [
             ],
             answer: 1, hint: "Review and Approval — the keywords of teamwork."
         },
-        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Push your feature branch to prepare for a Pull Request!",
+            steps: [
+                {
+                    instruction: "Push your feature branch to the remote",
+                    expectedCommand: "git push origin feature",
+                    successMessage: "Pushed! Now go to GitHub and open a Pull Request for your team to review.",
+                    hint: "git push origin feature"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
         id: 28, module: "Module 3: Collaboration", title: "The Fork: Your Own Franchise",
@@ -679,7 +849,21 @@ export const LESSONS = [
             ],
             answer: 0, hint: "Where does the copy live? Cloud or Local?"
         },
-        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "After forking on GitHub, clone the repo to your local machine!",
+            steps: [
+                {
+                    instruction: "Clone your forked repository",
+                    expectedCommand: "git clone https://github.com/you/franchise.git",
+                    matchPattern: "git clone",
+                    successMessage: "Cloned your fork! Now you have a local copy of your franchise to work on.",
+                    hint: "git clone https://github.com/you/franchise.git"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
         id: 29, module: "Module 3: Collaboration", title: "Distributed Power",
@@ -689,14 +873,28 @@ export const LESSONS = [
         challenge: {
             type: "quiz", question: "What does 'Distributed' mean in Git?",
             options: [
-                "You have to pay for마다 user",
+                "You have to pay for each user",
                 "The data is split into small pieces across the internet",
                 "Every user has a full copy of the entire repository project and its history",
                 "The code only works on certain computers"
             ],
             answer: 2, hint: "Complete backup on every laptop."
         },
-        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "See your full local history — proof that everything is stored on YOUR machine!",
+            steps: [
+                {
+                    instruction: "View the commit history in a compact format",
+                    expectedCommand: "git log --oneline",
+                    acceptAlso: ["git log"],
+                    successMessage: "See? Your entire project history is right here on your machine. That's the power of distributed!",
+                    hint: "git log --oneline"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
         id: 30, module: "Module 3: Collaboration", title: "The Sarah Conflict",
@@ -808,7 +1006,20 @@ export const LESSONS = [
             ],
             answer: 1, hint: "Think about pressing multiple things into one."
         },
-        initialState: { commits: [{ id: "c1", msg: "fix", branch: "main" }, { id: "c2", msg: "fix2", branch: "main" }], branches: ["main"], head: "main", files: [] }
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Start an interactive rebase to clean up messy commits!",
+            steps: [
+                {
+                    instruction: "Start an interactive rebase for the last 2 commits",
+                    expectedCommand: "git rebase -i HEAD~2",
+                    successMessage: "Interactive rebase started! In a real editor, you\'d see pick/squash/edit options for each commit.",
+                    hint: "git rebase -i HEAD~2"
+                }
+            ]
+        },
+        initialState: { commits: [{ id: "c1", msg: "fix", branch: "main" }, { id: "c2", msg: "fix2", branch: "main" }], branches: ["main"], head: "main", files: [] },
+        resultState: { commits: [{ id: "c1", msg: "Implement feature", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },
     {
         id: 34, module: "Module 4: Mastery", title: "The .gitignore Mastery",
@@ -817,30 +1028,30 @@ export const LESSONS = [
         explanation: "Ignoring files is critical for security. Never commit `.env` files!",
         challenge: {
             type: "terminal",
-            prompt: "Create a .gitignore to hide secrets.",
+            prompt: "Stop tracking the secrets file and verify it's ignored.",
             steps: [
                 {
-                    instruction: "Create the file",
-                    expectedCommand: "echo secrets.txt > .gitignore",
-                    successMessage: ".gitignore created! Git is now wearing blinders.",
-                    hint: "echo secrets.txt > .gitignore"
+                    instruction: "Remove secrets.txt from Git tracking (keep the file locally)",
+                    expectedCommand: "git rm --cached secrets.txt",
+                    successMessage: "Removed from tracking! The file still exists locally but Git ignores it now.",
+                    hint: "git rm --cached secrets.txt"
                 },
                 {
-                    instruction: "Check status to see the filter",
+                    instruction: "Check the status to see the effect",
                     expectedCommand: "git status",
-                    successMessage: "See? secrets.txt is no longer shown in the untracked list.",
+                    successMessage: "See? secrets.txt is now in the 'deleted from staging' list. Add it to .gitignore to keep it hidden permanently.",
                     hint: "git status"
                 }
             ]
         },
         initialState: {
             commits: [{ id: "c1", msg: "Base", branch: "main" }],
-            head: "main",
-            files: [{ name: "secrets.txt", status: "untracked" }]
+            branches: ["main"], head: "main",
+            files: [{ name: "secrets.txt", status: "staged" }, { name: ".gitignore", status: "untracked" }]
         },
         resultState: {
             commits: [{ id: "c1", msg: "Base", branch: "main" }],
-            head: "main",
+            branches: ["main"], head: "main",
             files: [{ name: ".gitignore", status: "staged" }]
         }
     },
@@ -858,6 +1069,19 @@ export const LESSONS = [
                 "git make shortcut co"
             ],
             answer: 1, hint: "Check the 'config' command."
+        },
+        bonusPractice: {
+            type: "terminal",
+            prompt: "Create your first Git alias to save time!",
+            steps: [
+                {
+                    instruction: "Create an alias \'st\' for \'status\'",
+                    expectedCommand: "git config --global alias.st status",
+                    matchPattern: "git config",
+                    successMessage: "Alias created! Now \'git st\' works the same as \'git status\'. Welcome to power-user territory!",
+                    hint: "git config --global alias.st status"
+                }
+            ]
         },
         initialState: { commits: [{ id: "c1", msg: "Base", branch: "main" }], branches: ["main"], head: "main", files: [] }
     },

@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BRANCH_COLORS = {
@@ -34,6 +34,8 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
     // Group commits by branch for layout
     const branchLanes = {};
     branches.forEach((b, i) => { branchLanes[b] = i; });
+
+    const [showLegend, setShowLegend] = useState(false);
 
     return (
         <div className="relative w-full h-full overflow-auto p-4">
@@ -344,6 +346,50 @@ export default function CommitGraph({ commits = [], branches = [], head, detache
                     );
                 })}
             </svg>
+
+            {/* Collapsible Legend */}
+            <div className="absolute bottom-2 right-2">
+                <button
+                    onClick={() => setShowLegend(!showLegend)}
+                    className="px-2 py-1 text-[9px] font-mono rounded bg-bg-tertiary/80 border border-border text-text-muted hover:text-text-primary hover:border-text-muted transition-all cursor-pointer backdrop-blur-sm"
+                >
+                    {showLegend ? "✕ Hide" : "? Legend"}
+                </button>
+                <AnimatePresence>
+                    {showLegend && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                            className="absolute bottom-8 right-0 w-52 p-3 rounded-xl bg-bg-secondary/95 border border-border backdrop-blur-md shadow-xl"
+                        >
+                            <p className="text-[9px] font-mono uppercase tracking-widest text-text-muted mb-2">Graph Legend</p>
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full bg-[#00e5ff] inline-block shrink-0" />
+                                    <span className="text-[10px] text-text-secondary">main branch</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full bg-[#39ff14] inline-block shrink-0" />
+                                    <span className="text-[10px] text-text-secondary">feature branch</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full bg-[#ff006e] inline-block shrink-0" />
+                                    <span className="text-[10px] text-text-secondary">hotfix / conflict</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full border-2 border-white inline-block shrink-0" />
+                                    <span className="text-[10px] text-text-secondary">HEAD (you are here)</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] text-[#ffd166]">★</span>
+                                    <span className="text-[10px] text-text-secondary">milestone commit</span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 }

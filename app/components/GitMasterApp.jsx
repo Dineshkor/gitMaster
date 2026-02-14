@@ -48,6 +48,8 @@ export default function GitMasterApp() {
     const [currentStepIdx, setCurrentStepIdx] = useState(0); // For multi-step challenges
     const [currentDiff, setCurrentDiff] = useState(null);
     const [showPractice, setShowPractice] = useState(false); // Two-phase flow: Theory -> Practice
+    const [bonusPracticeMode, setBonusPracticeMode] = useState(false); // Bonus practice after quiz
+    const [bonusPracticeStepIdx, setBonusPracticeStepIdx] = useState(0); // Step index for bonus practice
     const contentRef = useRef(null);
     const terminalRef = useRef(null);
 
@@ -108,22 +110,38 @@ export default function GitMasterApp() {
         setSelectedAnswer(idx);
         setAnswered(true);
         if (idx === lesson?.challenge?.answer) {
-            setTimeout(completeLesson, 600);
+            // If lesson has bonusPractice, don't auto-complete — let user try the bonus
+            if (!lesson?.bonusPractice) {
+                setTimeout(completeLesson, 600);
+            }
         }
     }, [answered, lesson, completeLesson]);
 
+    const retryQuiz = useCallback(() => {
+        setAnswered(false);
+        setSelectedAnswer(null);
+        setShowHint(false);
+        setHintLevel(0);
+    }, []);
+
     const handleTerminalCommand = useCallback((cmd) => {
         if (!cmd || typeof cmd !== "string") return { success: false, output: [] };
-        if (!lesson?.challenge || lesson.challenge.type !== "terminal") {
+
+        // Determine if we're in bonusPractice mode or normal terminal challenge
+        const inBonusMode = bonusPracticeMode && lesson?.bonusPractice;
+        const challengeSource = inBonusMode ? lesson.bonusPractice : lesson?.challenge;
+
+        if (!inBonusMode && (!lesson?.challenge || lesson.challenge.type !== "terminal")) {
             return { success: false, output: [{ text: "This lesson uses a quiz challenge — answer above!", type: "info" }] };
         }
 
-        const challenge = lesson.challenge;
+        const challenge = inBonusMode ? challengeSource : lesson.challenge;
         const steps = challenge.steps || [];
         const isMultiStep = steps.length > 0;
 
-        // Target specifically the current step if it exists
-        const currentStep = isMultiStep ? steps[currentStepIdx] : challenge;
+        // Use bonusPracticeStepIdx for bonus mode, currentStepIdx for normal
+        const stepIdx = inBonusMode ? bonusPracticeStepIdx : currentStepIdx;
+        const currentStep = isMultiStep ? steps[stepIdx] : challenge;
         const expected = currentStep.expectedCommand;
         const alts = currentStep.acceptAlso || [];
         const pattern = currentStep.matchPattern;
@@ -331,10 +349,11 @@ export default function GitMasterApp() {
 
         if (isMatch) {
             // Check if there are more steps
-            if (isMultiStep && currentStepIdx < steps.length - 1) {
+            if (isMultiStep && stepIdx < steps.length - 1) {
                 // Move to next step
                 applyResult();
-                setCurrentStepIdx(prev => prev + 1);
+                if (inBonusMode) setBonusPracticeStepIdx(prev => prev + 1);
+                else setCurrentStepIdx(prev => prev + 1);
                 return {
                     success: true,
                     output: [
@@ -391,7 +410,7 @@ export default function GitMasterApp() {
                 { text: `💡 ${challenge.hint || "Try the hint command for help."}`, type: "hint" },
             ]
         };
-    }, [lesson, completeLesson]);
+    }, [lesson, completeLesson, bonusPracticeMode, bonusPracticeStepIdx]);
 
     const goToLesson = useCallback((id) => {
         setLessonId(id);
@@ -403,6 +422,8 @@ export default function GitMasterApp() {
         setCurrentStepIdx(0);
         setCurrentDiff(null);
         setShowPractice(false);
+        setBonusPracticeMode(false);
+        setBonusPracticeStepIdx(0);
         setProgress(prev => ({ ...prev, currentLesson: id }));
     }, []);
 
@@ -897,14 +918,74 @@ export default function GitMasterApp() {
                                                             })}
                                                         </div>
                                                         {answered && selectedAnswer !== lesson.challenge.answer && (
-                                                            <motion.p
+                                                            <motion.div
                                                                 initial={{ opacity: 0 }}
                                                                 animate={{ opacity: 1 }}
-                                                                className="mt-3 text-xs text-accent-red font-mono"
+                                                                className="mt-3 flex items-center gap-3"
                                                             >
-                                                                Not quite! The correct answer is {String.fromCharCode(65 + lesson.challenge.answer)}.
-                                                                <button onClick={completeLesson} className="ml-2 underline text-accent-cyan cursor-pointer">Continue anyway →</button>
-                                                            </motion.p>
+                                                                <p className="text-xs text-accent-red font-mono">
+                                                                    Not quite! The correct answer is {String.fromCharCode(65 + lesson.challenge.answer)}.
+                                                                </p>
+                                                                <button
+                                                                    onClick={retryQuiz}
+                                                                    className="px-3 py-1.5 text-xs font-mono rounded-lg bg-accent-orange/10 border border-accent-orange/30 text-accent-orange hover:bg-accent-orange/20 transition-all cursor-pointer"
+                                                                >
+                                                                    🔄 Try Again
+                                                                </button>
+                                                                <button onClick={completeLesson} className="text-xs font-mono underline text-accent-cyan cursor-pointer">
+                                                                    Continue anyway →
+                                                                </button>
+                                                            </motion.div>
+                                                        )}
+                                                        {answered && selectedAnswer === lesson.challenge.answer && lesson.bonusPractice && !bonusPracticeMode && (
+                                                            <motion.div
+                                                                initial={{ opacity: 0, y: 10 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                className="mt-4 flex items-center gap-3"
+                                                            >
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setBonusPracticeMode(true);
+                                                                        setBonusPracticeStepIdx(0);
+                                                                        if (contentRef.current) {
+                                                                            setTimeout(() => {
+                                                                                contentRef.current.scrollTo({
+                                                                                    top: contentRef.current.scrollHeight,
+                                                                                    behavior: "smooth"
+                                                                                });
+                                                                            }, 100);
+                                                                        }
+                                                                    }}
+                                                                    className="px-4 py-2.5 text-xs font-mono rounded-xl bg-gradient-to-r from-accent-green to-accent-cyan text-bg-primary font-bold hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2"
+                                                                >
+                                                                    <span>🧪</span> Bonus Practice — Try it in the Terminal!
+                                                                </button>
+                                                                <button onClick={completeLesson} className="text-xs font-mono underline text-text-muted cursor-pointer hover:text-text-primary">
+                                                                    Skip →
+                                                                </button>
+                                                            </motion.div>
+                                                        )}
+                                                        {bonusPracticeMode && lesson.bonusPractice && (
+                                                            <motion.div
+                                                                initial={{ opacity: 0, y: 10 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                className="mt-4 p-3 rounded-lg bg-accent-green/5 border border-accent-green/20"
+                                                            >
+                                                                <div className="flex items-center justify-between mb-1">
+                                                                    <p className="text-sm text-accent-green font-mono">🧪 {lesson.bonusPractice.prompt}</p>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const cmdToRun = lesson.bonusPractice.steps?.[bonusPracticeStepIdx]?.expectedCommand;
+                                                                            terminalRef.current?.runExternalCommand(cmdToRun);
+                                                                        }}
+                                                                        className="px-2 py-1 text-[9px] font-mono rounded bg-accent-green/10 border border-accent-green/20 text-accent-green hover:bg-accent-green/20 transition-all cursor-pointer uppercase tracking-tight"
+                                                                        title="Execute this command for me"
+                                                                    >
+                                                                        Run for me
+                                                                    </button>
+                                                                </div>
+                                                                <p className="text-[10px] font-mono text-text-muted">Type the command in the terminal below ↓</p>
+                                                            </motion.div>
                                                         )}
                                                     </div>
                                                 )}
